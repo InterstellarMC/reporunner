@@ -213,6 +213,44 @@ class ExecutionService:
             "current_snapshot_id": self.current_snapshot_id,
         }
 
+    def verify(
+        self,
+        entrypoint: Optional[str] = None,
+        http_port: Optional[int] = None,
+        http_path: str = "/",
+        cli_command: Optional[str] = None,
+        baseline_test_count: Optional[int] = None,
+    ) -> VerificationReport:
+        """Run independent rule-based verification checks over the workspace."""
+        from backend.verifier.engine import VerificationEngine
+
+        class _Adapter:
+            def __init__(self, s: ExecutionService):
+                self.s = s
+                self.c = 0
+
+            def run(self, cmd: str, timeout_s: int = 120, cwd: str = "/workspace") -> Tuple[int, str, str]:
+                self.c += 1
+                req = CommandRequest(
+                    run_id=self.s.run_id,
+                    command_id=f"verify_cmd_{self.c}",
+                    command=cmd,
+                    cwd=cwd,
+                    timeout_s=timeout_s,
+                )
+                res = self.s.run_command(req)
+                return res.exit_code, res.stdout, res.stderr
+
+        engine = VerificationEngine(runner=_Adapter(self), sink=self.emitter)
+        return engine.verify(
+            run_id=self.run_id,
+            entrypoint=entrypoint,
+            http_port=http_port,
+            http_path=http_path,
+            cli_command=cli_command,
+            baseline_test_count=baseline_test_count,
+        )
+
     def close_run(self) -> None:
         """Clean up all sandbox and background process resources."""
         self.bg_process.stop_all()
