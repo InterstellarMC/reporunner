@@ -1,0 +1,13 @@
+{
+  "entry_id": "F7",
+  "name": "python-lib-version-conflict",
+  "stack": "python",
+  "expected": "GREEN",
+  "actual": "GREEN",
+  "match": true,
+  "steps_used": 4,
+  "wall_clock_seconds": 0.0,
+  "reproducibility_green": true,
+  "details": "All verification assertions and fresh rebuild passed",
+  "simulated": true
+}

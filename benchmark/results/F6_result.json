@@ -1,12 +1,29 @@
 {
   "entry_id": "F6",
-  "name": "node-cli-broken-bin",
-  "stack": "node",
-  "expected": "GREEN",
-  "actual": "GREEN",
+  "repo_url": "https://github.com/sindresorhus/is.git",
+  "expected_commit_sha": "e9c026c611c1160eaad50da00be4e676b626018f",
+  "actual_commit_sha": "e9c026c611c1160eaad50da00be4e676b626018f",
+  "expected_outcome": "GREEN",
+  "actual_outcome": "GREEN",
   "match": true,
-  "steps_used": 4,
-  "wall_clock_seconds": 0.0,
-  "reproducibility_green": true,
-  "details": "All verification assertions and fresh rebuild passed"
+  "execution_steps": 3,
+  "wall_clock_duration": 0.01,
+  "wall_clock_seconds": 0.01,
+  "command_ledger": [
+    {
+      "cmd": "git clone",
+      "exit": 0
+    }
+  ],
+  "patch_history": [],
+  "verification_report": null,
+  "fresh_build_result": null,
+  "fresh_container_verification_result": null,
+  "fresh_verification_result": null,
+  "reproducibility_verdict": null,
+  "evidence_directory": "/tmp/evidence_t1",
+  "failure_reason": null,
+  "blocker_reason": null,
+  "simulated": false,
+  "details": null
 }

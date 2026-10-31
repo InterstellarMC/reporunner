@@ -1,0 +1,13 @@
+{
+  "entry_id": "B1",
+  "name": "blocked-paid-api-key",
+  "stack": "python",
+  "expected": "BLOCKED",
+  "actual": "BLOCKED",
+  "match": true,
+  "steps_used": 2,
+  "wall_clock_seconds": 0.0,
+  "reproducibility_green": false,
+  "details": "Run stopped cleanly: required resource 'OPENAI_API_KEY' is unavailable",
+  "simulated": true
+}

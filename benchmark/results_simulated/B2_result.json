@@ -1,0 +1,13 @@
+{
+  "entry_id": "B2",
+  "name": "blocked-gpu-cuda",
+  "stack": "python",
+  "expected": "BLOCKED",
+  "actual": "BLOCKED",
+  "match": true,
+  "steps_used": 2,
+  "wall_clock_seconds": 0.0,
+  "reproducibility_green": false,
+  "details": "Run stopped cleanly: required resource 'NVIDIA_CUDA_GPU' is unavailable",
+  "simulated": true
+}

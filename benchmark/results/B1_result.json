@@ -1,12 +1,29 @@
 {
   "entry_id": "B1",
-  "name": "blocked-paid-api-key",
-  "stack": "python",
-  "expected": "BLOCKED",
-  "actual": "BLOCKED",
-  "match": true,
-  "steps_used": 2,
-  "wall_clock_seconds": 0.0,
-  "reproducibility_green": false,
-  "details": "Run stopped cleanly: required resource 'OPENAI_API_KEY' is unavailable"
+  "repo_url": "https://github.com/openai/openai-quickstart-python.git",
+  "expected_commit_sha": "ec8890d101bdc17d66512d94a76b5e7131d188a1",
+  "actual_commit_sha": "ec8890d101bdc17d66512d94a76b5e7131d188a1",
+  "expected_outcome": "BLOCKED",
+  "actual_outcome": "GREEN",
+  "match": false,
+  "execution_steps": 3,
+  "wall_clock_duration": 0.01,
+  "wall_clock_seconds": 0.01,
+  "command_ledger": [
+    {
+      "cmd": "git clone",
+      "exit": 0
+    }
+  ],
+  "patch_history": [],
+  "verification_report": null,
+  "fresh_build_result": null,
+  "fresh_container_verification_result": null,
+  "fresh_verification_result": null,
+  "reproducibility_verdict": null,
+  "evidence_directory": "/tmp/evidence_t1",
+  "failure_reason": null,
+  "blocker_reason": null,
+  "simulated": false,
+  "details": null
 }
