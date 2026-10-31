@@ -1,0 +1,104 @@
+[
+  {
+    "event_id": "84ddbb46-2494-4364-8a10-b76af8ef239c",
+    "run_id": "golden_s4_timeout",
+    "seq": 1,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s4_timeout",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "a2647342-124f-4004-98d9-8796c1fffc63",
+    "run_id": "golden_s4_timeout",
+    "seq": 2,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c1",
+      "command": "sleep 300",
+      "timeout_s": 5
+    }
+  },
+  {
+    "event_id": "29e06e93-307b-481e-9854-5695bc598b66",
+    "run_id": "golden_s4_timeout",
+    "seq": 3,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c1",
+      "exit_code": -1,
+      "status": "TIMEOUT",
+      "error_category": "TIMEOUT",
+      "fingerprint": "TIMEOUT:001"
+    }
+  },
+  {
+    "event_id": "886d89b1-c879-4ef0-af40-02715fee458a",
+    "run_id": "golden_s4_timeout",
+    "seq": 4,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s4_timeout"
+    }
+  },
+  {
+    "event_id": "ee70ac1c-392c-4f0f-9e0a-23083152cd12",
+    "run_id": "golden_s4_timeout",
+    "seq": 1,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s4_timeout",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "7706e7d0-10d5-41b3-a67b-fb40eb309548",
+    "run_id": "golden_s4_timeout",
+    "seq": 2,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c1",
+      "command": "sleep 300",
+      "timeout_s": 5
+    }
+  },
+  {
+    "event_id": "2a4f9d85-3b0b-4650-9bef-726aa564578c",
+    "run_id": "golden_s4_timeout",
+    "seq": 3,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c1",
+      "exit_code": -1,
+      "status": "TIMEOUT",
+      "error_category": "TIMEOUT",
+      "fingerprint": "TIMEOUT:001"
+    }
+  },
+  {
+    "event_id": "a4b91634-dc42-4106-a62b-74b750b2ee74",
+    "run_id": "golden_s4_timeout",
+    "seq": 4,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s4_timeout"
+    }
+  }
+]

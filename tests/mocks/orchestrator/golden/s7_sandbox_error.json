@@ -1,0 +1,102 @@
+[
+  {
+    "event_id": "a2a485a2-3991-44eb-ad0f-2561fb1a89af",
+    "run_id": "golden_s7_sandbox_error",
+    "seq": 1,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s7_sandbox_error",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "8eff51b8-6e71-45ef-88b7-91cb53e4cc31",
+    "run_id": "golden_s7_sandbox_error",
+    "seq": 2,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c1",
+      "command": "python app.py"
+    }
+  },
+  {
+    "event_id": "9248ee70-c471-4e87-9d5b-8106791807f7",
+    "run_id": "golden_s7_sandbox_error",
+    "seq": 3,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c1",
+      "exit_code": -1,
+      "status": "SANDBOX_ERROR",
+      "error_category": "UNKNOWN",
+      "stderr": "Container stopped unexpectedly"
+    }
+  },
+  {
+    "event_id": "d4c0bc24-9e2a-4c2f-b08f-286004278a68",
+    "run_id": "golden_s7_sandbox_error",
+    "seq": 4,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s7_sandbox_error"
+    }
+  },
+  {
+    "event_id": "2d248720-b52b-4c48-9fe1-a3c5ff8dc737",
+    "run_id": "golden_s7_sandbox_error",
+    "seq": 1,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s7_sandbox_error",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "9cde4e9f-869c-4352-96d4-8ff41341c5ea",
+    "run_id": "golden_s7_sandbox_error",
+    "seq": 2,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c1",
+      "command": "python app.py"
+    }
+  },
+  {
+    "event_id": "14ba1099-c5af-41e8-ab1a-8ed4152de438",
+    "run_id": "golden_s7_sandbox_error",
+    "seq": 3,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c1",
+      "exit_code": -1,
+      "status": "SANDBOX_ERROR",
+      "error_category": "UNKNOWN",
+      "stderr": "Container stopped unexpectedly"
+    }
+  },
+  {
+    "event_id": "c213a4c2-4e15-4ff0-beda-819f56406168",
+    "run_id": "golden_s7_sandbox_error",
+    "seq": 4,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s7_sandbox_error"
+    }
+  }
+]

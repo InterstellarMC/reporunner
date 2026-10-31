@@ -1,0 +1,344 @@
+[
+  {
+    "event_id": "1fd318e5-ca5a-4038-8eb0-dce6b4335633",
+    "run_id": "golden_s1_happy",
+    "seq": 1,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s1_happy",
+      "repo": "https://github.com/example/flask-app",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "d0416a18-96c3-4d28-b50a-1e126fd3deff",
+    "run_id": "golden_s1_happy",
+    "seq": 2,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c1",
+      "command": "python3 app.py",
+      "cwd": "/workspace"
+    }
+  },
+  {
+    "event_id": "c3669a0c-9689-44d5-8d14-2bd03a91a61b",
+    "run_id": "golden_s1_happy",
+    "seq": 3,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c1",
+      "exit_code": 1,
+      "status": "FAILED",
+      "error_category": "IMPORT_ERROR",
+      "fingerprint": "IMPORT_ERROR:8f3c1a"
+    }
+  },
+  {
+    "event_id": "2a8ae2e8-13aa-497b-924c-aac751582a81",
+    "run_id": "golden_s1_happy",
+    "seq": 4,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "patch.received",
+    "payload": {
+      "patch_id": "p1",
+      "action": "apply"
+    }
+  },
+  {
+    "event_id": "08e331ce-89fe-431d-9a9b-d62945dec799",
+    "run_id": "golden_s1_happy",
+    "seq": 5,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "patch.applied",
+    "payload": {
+      "patch_id": "p1",
+      "new_snapshot_id": "snap_fix_01",
+      "changed_files": [
+        "requirements.txt"
+      ]
+    }
+  },
+  {
+    "event_id": "5a1f03af-e435-49fe-81fe-829506916299",
+    "run_id": "golden_s1_happy",
+    "seq": 6,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c2",
+      "command": "pip install -r requirements.txt",
+      "cwd": "/workspace"
+    }
+  },
+  {
+    "event_id": "e734d060-f660-4350-8c16-84986f1f289f",
+    "run_id": "golden_s1_happy",
+    "seq": 7,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c2",
+      "exit_code": 0,
+      "status": "SUCCESS",
+      "error_category": "NONE"
+    }
+  },
+  {
+    "event_id": "d104e419-572c-408e-94a7-54db0451a6cd",
+    "run_id": "golden_s1_happy",
+    "seq": 8,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "process.started",
+    "payload": {
+      "process_id": "proc_web",
+      "port": 5000
+    }
+  },
+  {
+    "event_id": "4fefcc8f-a3dc-436c-b581-60a0f66e6641",
+    "run_id": "golden_s1_happy",
+    "seq": 9,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "verify.started",
+    "payload": {
+      "run_id": "golden_s1_happy",
+      "checks": [
+        "http",
+        "python"
+      ]
+    }
+  },
+  {
+    "event_id": "805f6c80-70b1-4a1e-b90b-42f73b4fd2de",
+    "run_id": "golden_s1_happy",
+    "seq": 10,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "check.finished",
+    "payload": {
+      "check_type": "http",
+      "verdict": "PASS",
+      "duration_s": 0.4
+    }
+  },
+  {
+    "event_id": "a1e704ca-8fd7-4278-98be-4d2e2e289b83",
+    "run_id": "golden_s1_happy",
+    "seq": 11,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "verify.finished",
+    "payload": {
+      "overall_status": "PASS",
+      "completion_level": "COMPLETE",
+      "is_green": true
+    }
+  },
+  {
+    "event_id": "06650433-9a80-41a8-9852-c2b5bf236be0",
+    "run_id": "golden_s1_happy",
+    "seq": 12,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "repro.finished",
+    "payload": {
+      "is_green": true,
+      "reasons": []
+    }
+  },
+  {
+    "event_id": "ce51d682-ee34-4eaa-b45d-4b90661d3505",
+    "run_id": "golden_s1_happy",
+    "seq": 13,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s1_happy"
+    }
+  },
+  {
+    "event_id": "babe2223-f8fc-43ae-a72b-0a80b12c847a",
+    "run_id": "golden_s1_happy",
+    "seq": 1,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s1_happy",
+      "repo": "https://github.com/example/flask-app",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "02c109e4-d516-4bfa-b87e-97d0bd651030",
+    "run_id": "golden_s1_happy",
+    "seq": 2,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c1",
+      "command": "python3 app.py",
+      "cwd": "/workspace"
+    }
+  },
+  {
+    "event_id": "82c9a4ce-7d1d-465e-aa88-ab0de44facd2",
+    "run_id": "golden_s1_happy",
+    "seq": 3,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c1",
+      "exit_code": 1,
+      "status": "FAILED",
+      "error_category": "IMPORT_ERROR",
+      "fingerprint": "IMPORT_ERROR:8f3c1a"
+    }
+  },
+  {
+    "event_id": "cd2abd91-2743-4b49-bb40-f05ce10b4440",
+    "run_id": "golden_s1_happy",
+    "seq": 4,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "patch.received",
+    "payload": {
+      "patch_id": "p1",
+      "action": "apply"
+    }
+  },
+  {
+    "event_id": "53ae3ca8-ee1e-4222-aa25-4bf1786cc671",
+    "run_id": "golden_s1_happy",
+    "seq": 5,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "patch.applied",
+    "payload": {
+      "patch_id": "p1",
+      "new_snapshot_id": "snap_fix_01",
+      "changed_files": [
+        "requirements.txt"
+      ]
+    }
+  },
+  {
+    "event_id": "94cf6355-41e8-4827-a1af-0319abdfc4d5",
+    "run_id": "golden_s1_happy",
+    "seq": 6,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c2",
+      "command": "pip install -r requirements.txt",
+      "cwd": "/workspace"
+    }
+  },
+  {
+    "event_id": "7d740e87-358e-4db4-b445-fa995b84767a",
+    "run_id": "golden_s1_happy",
+    "seq": 7,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c2",
+      "exit_code": 0,
+      "status": "SUCCESS",
+      "error_category": "NONE"
+    }
+  },
+  {
+    "event_id": "085feb7c-cf85-4cd3-b2fe-508516638125",
+    "run_id": "golden_s1_happy",
+    "seq": 8,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "process.started",
+    "payload": {
+      "process_id": "proc_web",
+      "port": 5000
+    }
+  },
+  {
+    "event_id": "4dbd999d-8ae1-4512-9c54-b5fa942c8216",
+    "run_id": "golden_s1_happy",
+    "seq": 9,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "verify.started",
+    "payload": {
+      "run_id": "golden_s1_happy",
+      "checks": [
+        "http",
+        "python"
+      ]
+    }
+  },
+  {
+    "event_id": "1ea174bb-e18c-45bd-a428-d6454fc4e896",
+    "run_id": "golden_s1_happy",
+    "seq": 10,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "check.finished",
+    "payload": {
+      "check_type": "http",
+      "verdict": "PASS",
+      "duration_s": 0.4
+    }
+  },
+  {
+    "event_id": "bbb14922-f400-4c4c-93a4-079ce24aa679",
+    "run_id": "golden_s1_happy",
+    "seq": 11,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "verify.finished",
+    "payload": {
+      "overall_status": "PASS",
+      "completion_level": "COMPLETE",
+      "is_green": true
+    }
+  },
+  {
+    "event_id": "bc7028dc-e0f8-4bb7-aa5d-e1ccb12760bb",
+    "run_id": "golden_s1_happy",
+    "seq": 12,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "repro.finished",
+    "payload": {
+      "is_green": true,
+      "reasons": []
+    }
+  },
+  {
+    "event_id": "20a20406-9069-40e3-ab0b-d8a31c5a1b42",
+    "run_id": "golden_s1_happy",
+    "seq": 13,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s1_happy"
+    }
+  }
+]

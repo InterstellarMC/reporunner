@@ -1,0 +1,98 @@
+[
+  {
+    "event_id": "18449470-e6dd-463a-be06-fe2d7958f501",
+    "run_id": "golden_s3_overlap",
+    "seq": 1,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s3_overlap",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "92ce1d64-b632-449c-85a7-bbec76b05dba",
+    "run_id": "golden_s3_overlap",
+    "seq": 2,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "patch.received",
+    "payload": {
+      "patch_id": "p1",
+      "action": "apply"
+    }
+  },
+  {
+    "event_id": "fa09808a-234a-474b-938f-32051c1d6225",
+    "run_id": "golden_s3_overlap",
+    "seq": 3,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "patch.rejected",
+    "payload": {
+      "patch_id": "p1",
+      "rejection_code": "OVERLAP",
+      "reason": "Conflicting duplicate operations on path 'main.py'"
+    }
+  },
+  {
+    "event_id": "b22dafb6-7d8a-4245-a393-a691df1757f2",
+    "run_id": "golden_s3_overlap",
+    "seq": 4,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s3_overlap"
+    }
+  },
+  {
+    "event_id": "41d583ce-67ef-4fec-83e3-ca57ddf5fd85",
+    "run_id": "golden_s3_overlap",
+    "seq": 1,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s3_overlap",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "87ec3a0a-092b-4a4f-b030-139b6b0fb45e",
+    "run_id": "golden_s3_overlap",
+    "seq": 2,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "patch.received",
+    "payload": {
+      "patch_id": "p1",
+      "action": "apply"
+    }
+  },
+  {
+    "event_id": "371ecc24-a8c7-477b-91ad-9ec3be53b9b6",
+    "run_id": "golden_s3_overlap",
+    "seq": 3,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "patch.rejected",
+    "payload": {
+      "patch_id": "p1",
+      "rejection_code": "OVERLAP",
+      "reason": "Conflicting duplicate operations on path 'main.py'"
+    }
+  },
+  {
+    "event_id": "2719d5b3-d216-44aa-8cf9-22897924aed8",
+    "run_id": "golden_s3_overlap",
+    "seq": 4,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s3_overlap"
+    }
+  }
+]

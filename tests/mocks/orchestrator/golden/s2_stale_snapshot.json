@@ -1,0 +1,152 @@
+[
+  {
+    "event_id": "647a6a5b-393e-464d-94b7-c70686df95aa",
+    "run_id": "golden_s2_stale",
+    "seq": 1,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s2_stale",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "7016f827-6737-45d9-bbef-02e11c1e5386",
+    "run_id": "golden_s2_stale",
+    "seq": 2,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "patch.received",
+    "payload": {
+      "patch_id": "p1",
+      "action": "apply"
+    }
+  },
+  {
+    "event_id": "7cdaa142-1e15-4f67-a34b-02bc895475ca",
+    "run_id": "golden_s2_stale",
+    "seq": 3,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "patch.applied",
+    "payload": {
+      "patch_id": "p1",
+      "new_snapshot_id": "head_snap_999",
+      "changed_files": [
+        "app.py"
+      ]
+    }
+  },
+  {
+    "event_id": "2240dece-67bd-4636-9a89-ba74a7370e17",
+    "run_id": "golden_s2_stale",
+    "seq": 4,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "patch.received",
+    "payload": {
+      "patch_id": "p2",
+      "action": "apply"
+    }
+  },
+  {
+    "event_id": "9882ee26-8c5c-47a3-a637-b654b658cb8d",
+    "run_id": "golden_s2_stale",
+    "seq": 5,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "patch.rejected",
+    "payload": {
+      "patch_id": "p2",
+      "rejection_code": "STALE_SNAPSHOT",
+      "reason": "Base snapshot old_snap_000 is stale; current head is head_snap_999"
+    }
+  },
+  {
+    "event_id": "c5b50356-bf06-42d7-ae9e-89ad66d7bab9",
+    "run_id": "golden_s2_stale",
+    "seq": 6,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s2_stale"
+    }
+  },
+  {
+    "event_id": "88df8fe6-d865-415f-b560-8426a53ea1af",
+    "run_id": "golden_s2_stale",
+    "seq": 1,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s2_stale",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "ce8d59da-2b5a-4a0a-886c-53f8c515a982",
+    "run_id": "golden_s2_stale",
+    "seq": 2,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "patch.received",
+    "payload": {
+      "patch_id": "p1",
+      "action": "apply"
+    }
+  },
+  {
+    "event_id": "8b7c5309-daec-4647-b12f-0f13cbc51148",
+    "run_id": "golden_s2_stale",
+    "seq": 3,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "patch.applied",
+    "payload": {
+      "patch_id": "p1",
+      "new_snapshot_id": "head_snap_999",
+      "changed_files": [
+        "app.py"
+      ]
+    }
+  },
+  {
+    "event_id": "2c0288d5-3f22-479f-b426-c14e7520bb73",
+    "run_id": "golden_s2_stale",
+    "seq": 4,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "patch.received",
+    "payload": {
+      "patch_id": "p2",
+      "action": "apply"
+    }
+  },
+  {
+    "event_id": "b4fc3a37-6a89-4bdc-b854-60b39cfa1854",
+    "run_id": "golden_s2_stale",
+    "seq": 5,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "patch.rejected",
+    "payload": {
+      "patch_id": "p2",
+      "rejection_code": "STALE_SNAPSHOT",
+      "reason": "Base snapshot old_snap_000 is stale; current head is head_snap_999"
+    }
+  },
+  {
+    "event_id": "1cd0c36e-46b4-4916-9e25-c60ad6175e25",
+    "run_id": "golden_s2_stale",
+    "seq": 6,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s2_stale"
+    }
+  }
+]

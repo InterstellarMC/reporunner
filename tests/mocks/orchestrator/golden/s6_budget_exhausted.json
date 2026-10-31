@@ -1,0 +1,1324 @@
+[
+  {
+    "event_id": "9cc4cbd4-90f4-4df3-aaad-8384ee9ab3b3",
+    "run_id": "golden_s6_budget",
+    "seq": 1,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s6_budget",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "24d68ccd-a92f-4244-b495-769e61bc9706",
+    "run_id": "golden_s6_budget",
+    "seq": 2,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c1",
+      "command": "echo step 1"
+    }
+  },
+  {
+    "event_id": "64a2c7f1-34a4-4fbd-bcb9-c42d8e126ae0",
+    "run_id": "golden_s6_budget",
+    "seq": 3,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c1",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "43e2ae58-8c1d-4392-89a9-bac203a8deb0",
+    "run_id": "golden_s6_budget",
+    "seq": 4,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c2",
+      "command": "echo step 2"
+    }
+  },
+  {
+    "event_id": "1afa2c39-d738-4c95-80a1-241272371891",
+    "run_id": "golden_s6_budget",
+    "seq": 5,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c2",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "440bdb7f-3eaf-4829-8e45-182e1c9b58b1",
+    "run_id": "golden_s6_budget",
+    "seq": 6,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c3",
+      "command": "echo step 3"
+    }
+  },
+  {
+    "event_id": "dbc88110-33db-4337-ae74-b8b89269f157",
+    "run_id": "golden_s6_budget",
+    "seq": 7,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c3",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "37368fe4-a49b-48ff-bd36-cc36e5d4f054",
+    "run_id": "golden_s6_budget",
+    "seq": 8,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c4",
+      "command": "echo step 4"
+    }
+  },
+  {
+    "event_id": "59abb29e-d0f5-4c71-a124-f4fd39ce8779",
+    "run_id": "golden_s6_budget",
+    "seq": 9,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c4",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "c0cbd530-1a0c-4075-8ea5-5f54d846d195",
+    "run_id": "golden_s6_budget",
+    "seq": 10,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c5",
+      "command": "echo step 5"
+    }
+  },
+  {
+    "event_id": "edb1564f-7339-4f11-8aff-883236e6e43d",
+    "run_id": "golden_s6_budget",
+    "seq": 11,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c5",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "71fd0381-c52a-482e-b641-ba4932905216",
+    "run_id": "golden_s6_budget",
+    "seq": 12,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c6",
+      "command": "echo step 6"
+    }
+  },
+  {
+    "event_id": "dbf1f767-a374-4f8f-addd-cf83c9b1a278",
+    "run_id": "golden_s6_budget",
+    "seq": 13,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c6",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "26d3490c-a412-4801-b739-2fb9772429f4",
+    "run_id": "golden_s6_budget",
+    "seq": 14,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c7",
+      "command": "echo step 7"
+    }
+  },
+  {
+    "event_id": "f62764bd-74f1-4048-a482-efb81e3f8c76",
+    "run_id": "golden_s6_budget",
+    "seq": 15,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c7",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "c4d5f97e-a614-472f-ac99-42e7eb02e291",
+    "run_id": "golden_s6_budget",
+    "seq": 16,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c8",
+      "command": "echo step 8"
+    }
+  },
+  {
+    "event_id": "814cc14c-648a-4275-a17d-b07498c4c964",
+    "run_id": "golden_s6_budget",
+    "seq": 17,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c8",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "20a1be94-d028-4818-ae0d-f37c494f9f35",
+    "run_id": "golden_s6_budget",
+    "seq": 18,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c9",
+      "command": "echo step 9"
+    }
+  },
+  {
+    "event_id": "5b82df2e-6fdd-4b8c-a0c1-8c5404d33c30",
+    "run_id": "golden_s6_budget",
+    "seq": 19,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c9",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "86c87155-6356-49a6-8b13-8a9df5545048",
+    "run_id": "golden_s6_budget",
+    "seq": 20,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c10",
+      "command": "echo step 10"
+    }
+  },
+  {
+    "event_id": "6b15afaf-2818-48b6-8d89-54ca57ea58c8",
+    "run_id": "golden_s6_budget",
+    "seq": 21,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c10",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "2ecee4b2-4042-4ea0-a503-bc667b1d4066",
+    "run_id": "golden_s6_budget",
+    "seq": 22,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c11",
+      "command": "echo step 11"
+    }
+  },
+  {
+    "event_id": "6b26994d-8b12-4dde-bfd0-31d44fda1f7d",
+    "run_id": "golden_s6_budget",
+    "seq": 23,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c11",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "24f4e704-1344-4a88-a9b6-801086f9e0d9",
+    "run_id": "golden_s6_budget",
+    "seq": 24,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c12",
+      "command": "echo step 12"
+    }
+  },
+  {
+    "event_id": "0610f2ff-4312-4176-8a48-f38216ac1a2e",
+    "run_id": "golden_s6_budget",
+    "seq": 25,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c12",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "d0ec1ddd-394c-4f5c-b464-f391bb47bccc",
+    "run_id": "golden_s6_budget",
+    "seq": 26,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c13",
+      "command": "echo step 13"
+    }
+  },
+  {
+    "event_id": "4ad995e3-18a2-4710-ada8-803ae06cd20b",
+    "run_id": "golden_s6_budget",
+    "seq": 27,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c13",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "ba9850d1-b8b1-495a-9e2d-3066cd8a8a5c",
+    "run_id": "golden_s6_budget",
+    "seq": 28,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c14",
+      "command": "echo step 14"
+    }
+  },
+  {
+    "event_id": "21fc341c-d1de-4837-93bd-16a9217ac4ba",
+    "run_id": "golden_s6_budget",
+    "seq": 29,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c14",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "3de1f412-affc-47b0-8047-147cb6af3364",
+    "run_id": "golden_s6_budget",
+    "seq": 30,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c15",
+      "command": "echo step 15"
+    }
+  },
+  {
+    "event_id": "87cb21dd-3ecb-4e3c-a4d5-9c79a58cc05f",
+    "run_id": "golden_s6_budget",
+    "seq": 31,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c15",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "87744cfd-200e-4d13-b6de-c118f40ebf13",
+    "run_id": "golden_s6_budget",
+    "seq": 32,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c16",
+      "command": "echo step 16"
+    }
+  },
+  {
+    "event_id": "f38957e1-1b81-4eb1-aa7d-efa2e053ef87",
+    "run_id": "golden_s6_budget",
+    "seq": 33,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c16",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "6339649c-4214-4e10-814c-c02072adc3ff",
+    "run_id": "golden_s6_budget",
+    "seq": 34,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c17",
+      "command": "echo step 17"
+    }
+  },
+  {
+    "event_id": "3a4c7b86-bcb4-4955-b3b6-807402e203ff",
+    "run_id": "golden_s6_budget",
+    "seq": 35,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c17",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "e891f8bb-33ac-4fae-8794-4e0cc7a7b062",
+    "run_id": "golden_s6_budget",
+    "seq": 36,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c18",
+      "command": "echo step 18"
+    }
+  },
+  {
+    "event_id": "15a7c8e8-8d74-43c6-96f1-9e8b387bbaae",
+    "run_id": "golden_s6_budget",
+    "seq": 37,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c18",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "55e24c49-ded9-404b-b7af-97e922f8cbda",
+    "run_id": "golden_s6_budget",
+    "seq": 38,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c19",
+      "command": "echo step 19"
+    }
+  },
+  {
+    "event_id": "cf2ad625-11dd-4484-9f9e-6718a6b1a8ac",
+    "run_id": "golden_s6_budget",
+    "seq": 39,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c19",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "1ee29060-edf6-4caf-b571-77d893ef06cc",
+    "run_id": "golden_s6_budget",
+    "seq": 40,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c20",
+      "command": "echo step 20"
+    }
+  },
+  {
+    "event_id": "f28d2666-3051-4df4-857b-045d7c2b83d9",
+    "run_id": "golden_s6_budget",
+    "seq": 41,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c20",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "41094f3f-daad-4e0b-94f1-17faaf9136fa",
+    "run_id": "golden_s6_budget",
+    "seq": 42,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c21",
+      "command": "echo step 21"
+    }
+  },
+  {
+    "event_id": "71a180c5-0fce-42ea-8ac8-f73983a70d8c",
+    "run_id": "golden_s6_budget",
+    "seq": 43,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c21",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "bdd49a71-0113-49f7-8c54-d64d930c8322",
+    "run_id": "golden_s6_budget",
+    "seq": 44,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c22",
+      "command": "echo step 22"
+    }
+  },
+  {
+    "event_id": "c2dc97de-c758-47b1-9033-71b6a1d6290e",
+    "run_id": "golden_s6_budget",
+    "seq": 45,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c22",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "618a0fc7-70be-4bed-a1de-d8bc62ba5c80",
+    "run_id": "golden_s6_budget",
+    "seq": 46,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c23",
+      "command": "echo step 23"
+    }
+  },
+  {
+    "event_id": "cc416ecf-7cfb-40cb-bcfb-0f6293dbabc6",
+    "run_id": "golden_s6_budget",
+    "seq": 47,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c23",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "8761242e-e29b-48f6-928b-ce0d645f034f",
+    "run_id": "golden_s6_budget",
+    "seq": 48,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c24",
+      "command": "echo step 24"
+    }
+  },
+  {
+    "event_id": "18f07275-542d-4486-a752-bfdd60182dfa",
+    "run_id": "golden_s6_budget",
+    "seq": 49,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c24",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "817c9408-7022-401b-bda7-53c6ce2ddf69",
+    "run_id": "golden_s6_budget",
+    "seq": 50,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c25",
+      "command": "echo step 25"
+    }
+  },
+  {
+    "event_id": "204a2ff8-7fca-435a-ab2b-a859e443e54a",
+    "run_id": "golden_s6_budget",
+    "seq": 51,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c25",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "71b9018b-3b68-4805-8681-8f359b4e5087",
+    "run_id": "golden_s6_budget",
+    "seq": 52,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "budget.exhausted",
+    "payload": {
+      "run_id": "golden_s6_budget",
+      "steps_used": 25,
+      "reason": "Step ceiling reached (25/25 steps)"
+    }
+  },
+  {
+    "event_id": "23d2ddba-b256-441f-902c-52bf0c24c0d7",
+    "run_id": "golden_s6_budget",
+    "seq": 53,
+    "ts": "2026-10-31T15:52:12Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s6_budget"
+    }
+  },
+  {
+    "event_id": "34f1599c-3f86-40b5-97f9-0b422fb03eb8",
+    "run_id": "golden_s6_budget",
+    "seq": 1,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.provisioned",
+    "payload": {
+      "run_id": "golden_s6_budget",
+      "base_image": "python:3.11-slim"
+    }
+  },
+  {
+    "event_id": "c692016b-f8c6-47eb-a018-735450756061",
+    "run_id": "golden_s6_budget",
+    "seq": 2,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c1",
+      "command": "echo step 1"
+    }
+  },
+  {
+    "event_id": "ebd2797b-8b2c-4af0-a450-c200f6456f40",
+    "run_id": "golden_s6_budget",
+    "seq": 3,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c1",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "cb0b6cb6-9ca2-4dc5-9e52-44977df3e2a8",
+    "run_id": "golden_s6_budget",
+    "seq": 4,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c2",
+      "command": "echo step 2"
+    }
+  },
+  {
+    "event_id": "5d1617c6-2e7b-4dae-96fc-b34af7dbad13",
+    "run_id": "golden_s6_budget",
+    "seq": 5,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c2",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "576551b1-0e72-4de1-b06a-8de7a29492ce",
+    "run_id": "golden_s6_budget",
+    "seq": 6,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c3",
+      "command": "echo step 3"
+    }
+  },
+  {
+    "event_id": "c9af2986-b5fd-493e-ae24-d05692a20ba2",
+    "run_id": "golden_s6_budget",
+    "seq": 7,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c3",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "50b27a0f-4cef-4095-aa45-34ca50ce207b",
+    "run_id": "golden_s6_budget",
+    "seq": 8,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c4",
+      "command": "echo step 4"
+    }
+  },
+  {
+    "event_id": "11de20ad-8393-4697-a7cb-6f83e441ed90",
+    "run_id": "golden_s6_budget",
+    "seq": 9,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c4",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "5104271d-92c5-484f-82d4-0000b07fd640",
+    "run_id": "golden_s6_budget",
+    "seq": 10,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c5",
+      "command": "echo step 5"
+    }
+  },
+  {
+    "event_id": "f3404328-797c-4be4-bf72-7bbf5f14c86e",
+    "run_id": "golden_s6_budget",
+    "seq": 11,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c5",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "0413e9da-22fc-4730-8225-0f66d19517ea",
+    "run_id": "golden_s6_budget",
+    "seq": 12,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c6",
+      "command": "echo step 6"
+    }
+  },
+  {
+    "event_id": "f18c513b-78e8-4ab7-b97c-89c6a1474dd3",
+    "run_id": "golden_s6_budget",
+    "seq": 13,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c6",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "a8ffe250-121e-407c-80f4-0b9ae3b32b97",
+    "run_id": "golden_s6_budget",
+    "seq": 14,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c7",
+      "command": "echo step 7"
+    }
+  },
+  {
+    "event_id": "9afb3fe7-1e53-41cf-93a8-314de6776f04",
+    "run_id": "golden_s6_budget",
+    "seq": 15,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c7",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "77ab931c-e9bb-460d-b679-23acc017524f",
+    "run_id": "golden_s6_budget",
+    "seq": 16,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c8",
+      "command": "echo step 8"
+    }
+  },
+  {
+    "event_id": "f95ffaa0-8f99-46a2-b94e-d338312536db",
+    "run_id": "golden_s6_budget",
+    "seq": 17,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c8",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "710e9867-2447-44aa-9d3f-1f4a08897b92",
+    "run_id": "golden_s6_budget",
+    "seq": 18,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c9",
+      "command": "echo step 9"
+    }
+  },
+  {
+    "event_id": "100aa033-cfc7-441f-9e24-c2d02bc8b520",
+    "run_id": "golden_s6_budget",
+    "seq": 19,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c9",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "d39fd5f9-01b0-4ed4-950a-223774f43603",
+    "run_id": "golden_s6_budget",
+    "seq": 20,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c10",
+      "command": "echo step 10"
+    }
+  },
+  {
+    "event_id": "25d42616-8ff8-4d5b-86a8-2385ec9f03d7",
+    "run_id": "golden_s6_budget",
+    "seq": 21,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c10",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "6376a3c7-b78a-4681-b49a-3e2d6fc3b4e8",
+    "run_id": "golden_s6_budget",
+    "seq": 22,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c11",
+      "command": "echo step 11"
+    }
+  },
+  {
+    "event_id": "08286114-505f-4b1b-b1d8-0f80df1d0297",
+    "run_id": "golden_s6_budget",
+    "seq": 23,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c11",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "7ed9285e-d1ef-4ad3-8e44-5d4419742f82",
+    "run_id": "golden_s6_budget",
+    "seq": 24,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c12",
+      "command": "echo step 12"
+    }
+  },
+  {
+    "event_id": "bba242c9-bfe1-4dc5-990a-63be91c64ab2",
+    "run_id": "golden_s6_budget",
+    "seq": 25,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c12",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "da263841-fc79-4538-bae6-05373bed0add",
+    "run_id": "golden_s6_budget",
+    "seq": 26,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c13",
+      "command": "echo step 13"
+    }
+  },
+  {
+    "event_id": "8929f42d-d46a-4ef8-a3cc-3d34040387f7",
+    "run_id": "golden_s6_budget",
+    "seq": 27,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c13",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "85b35746-0481-4a41-9417-96d470b913aa",
+    "run_id": "golden_s6_budget",
+    "seq": 28,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c14",
+      "command": "echo step 14"
+    }
+  },
+  {
+    "event_id": "62d3a66c-773c-4a73-9fbe-90171a01f043",
+    "run_id": "golden_s6_budget",
+    "seq": 29,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c14",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "bbffb3cb-2d2d-4c52-8e90-adca136fa699",
+    "run_id": "golden_s6_budget",
+    "seq": 30,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c15",
+      "command": "echo step 15"
+    }
+  },
+  {
+    "event_id": "fec626d4-0ab8-47d9-8e0f-1ef2a67598cb",
+    "run_id": "golden_s6_budget",
+    "seq": 31,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c15",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "aa811a07-56ae-46eb-8823-d8fda23cf5a8",
+    "run_id": "golden_s6_budget",
+    "seq": 32,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c16",
+      "command": "echo step 16"
+    }
+  },
+  {
+    "event_id": "e1ec414c-4ca6-4f2c-8723-08391eb26421",
+    "run_id": "golden_s6_budget",
+    "seq": 33,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c16",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "97ae8a85-dd11-413d-84da-53f56d37504e",
+    "run_id": "golden_s6_budget",
+    "seq": 34,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c17",
+      "command": "echo step 17"
+    }
+  },
+  {
+    "event_id": "1d35557e-3fae-45cb-98d7-39231066f225",
+    "run_id": "golden_s6_budget",
+    "seq": 35,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c17",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "cf42f62a-ac27-4b6d-8dda-ebbdc9e117bd",
+    "run_id": "golden_s6_budget",
+    "seq": 36,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c18",
+      "command": "echo step 18"
+    }
+  },
+  {
+    "event_id": "8c69b18d-5fd5-4fd2-9215-279addca80a9",
+    "run_id": "golden_s6_budget",
+    "seq": 37,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c18",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "eee4f119-9a9a-4e11-a9b0-63647db219fc",
+    "run_id": "golden_s6_budget",
+    "seq": 38,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c19",
+      "command": "echo step 19"
+    }
+  },
+  {
+    "event_id": "9d0db116-103f-4d5e-b348-95b20bff55c7",
+    "run_id": "golden_s6_budget",
+    "seq": 39,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c19",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "72194e84-92dd-460c-a805-58044b83ea05",
+    "run_id": "golden_s6_budget",
+    "seq": 40,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c20",
+      "command": "echo step 20"
+    }
+  },
+  {
+    "event_id": "774095d0-7c7a-49e9-b2ed-0b984dc5e508",
+    "run_id": "golden_s6_budget",
+    "seq": 41,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c20",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "91c20156-eb4e-4d1f-bab4-14762fa6e4c7",
+    "run_id": "golden_s6_budget",
+    "seq": 42,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c21",
+      "command": "echo step 21"
+    }
+  },
+  {
+    "event_id": "b671b84e-3b8e-4b6c-a1a1-4eeacb5b5814",
+    "run_id": "golden_s6_budget",
+    "seq": 43,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c21",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "47482095-b7ee-4a04-93da-76a529d32648",
+    "run_id": "golden_s6_budget",
+    "seq": 44,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c22",
+      "command": "echo step 22"
+    }
+  },
+  {
+    "event_id": "a5a9d2dc-0857-40b6-be34-1054f39bf1bc",
+    "run_id": "golden_s6_budget",
+    "seq": 45,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c22",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "867bd173-c783-4a7f-a392-c40d376ede17",
+    "run_id": "golden_s6_budget",
+    "seq": 46,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c23",
+      "command": "echo step 23"
+    }
+  },
+  {
+    "event_id": "3d8a71fe-6b6d-4240-bc66-95b2286cb8e7",
+    "run_id": "golden_s6_budget",
+    "seq": 47,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c23",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "9d765d2a-cc4c-4773-ae83-14b3e7d79313",
+    "run_id": "golden_s6_budget",
+    "seq": 48,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c24",
+      "command": "echo step 24"
+    }
+  },
+  {
+    "event_id": "c4c4ea4e-0764-4745-97de-66b07244a345",
+    "run_id": "golden_s6_budget",
+    "seq": 49,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c24",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "dd344d90-3220-4813-b2ff-c660904b724d",
+    "run_id": "golden_s6_budget",
+    "seq": 50,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.started",
+    "payload": {
+      "command_id": "c25",
+      "command": "echo step 25"
+    }
+  },
+  {
+    "event_id": "3f1b5372-7609-4f08-88f5-8d1984e2bbfd",
+    "run_id": "golden_s6_budget",
+    "seq": 51,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "command.finished",
+    "payload": {
+      "command_id": "c25",
+      "exit_code": 0,
+      "status": "SUCCESS"
+    }
+  },
+  {
+    "event_id": "7937fa1c-672f-4442-908f-34e781bc4728",
+    "run_id": "golden_s6_budget",
+    "seq": 52,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "budget.exhausted",
+    "payload": {
+      "run_id": "golden_s6_budget",
+      "steps_used": 25,
+      "reason": "Step ceiling reached (25/25 steps)"
+    }
+  },
+  {
+    "event_id": "1df66d25-9e6f-4a30-a5d1-5d0d7fe9382a",
+    "run_id": "golden_s6_budget",
+    "seq": 53,
+    "ts": "2026-10-31T15:53:38Z",
+    "source": "execution",
+    "type": "run.closed",
+    "payload": {
+      "run_id": "golden_s6_budget"
+    }
+  }
+]

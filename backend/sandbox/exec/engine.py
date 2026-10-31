@@ -91,41 +91,14 @@ class CommandEngine:
                 timeout_s=req.timeout_s,
             )
 
-            # Output decoding and stream processing
             decoded_text = raw_output.decode("utf-8", errors="replace")
-            # If exit_code is 0, treat as stdout, else separate or combined
-            stdout_text = decoded_text if exit_code == 0 else ""
-            stderr_text = "" if exit_code == 0 else decoded_text
-
-            clean_out, clean_err, is_truncated = process_output(
-                stdout=stdout_text,
-                stderr=stderr_text,
-                secrets=secrets,
-            )
-
-            # Determine execution status
-            if exit_code == 0:
-                status = ExecutionStatus.SUCCESS
-                err_category = ErrorCategory.NONE
-            elif "timed out" in decoded_text.lower():
-                status = ExecutionStatus.TIMEOUT
-                err_category = ErrorCategory.TIMEOUT
-            else:
-                status = ExecutionStatus.FAILED
-                err_category = ErrorCategory.UNKNOWN
-
-            res = ExecutionResult(
-                run_id=req.run_id,
-                command_id=req.command_id,
+            from backend.sandbox.feedback.generator import build_execution_result
+            res = build_execution_result(
+                req=req,
                 exit_code=exit_code,
-                stdout=clean_out,
-                stderr=clean_err,
-                duration=round(duration, 3),
-                status=status,
-                error_category=err_category,
-                truncated=is_truncated,
+                raw_output=decoded_text,
+                duration=duration,
                 started_at=start_time_iso,
-                ended_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             )
 
         except Exception as e:
