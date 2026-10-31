@@ -13,7 +13,13 @@ dependencies = [
     "docker",
     "streamlit",
     "playwright",
+    "typer>=0.9",
+    "rich>=13",
+    "httpx>=0.27"
 ]
+
+[project.scripts]
+reporunner = "reporunner.__main__:main"
 
 [project.optional-dependencies]
 dev = ["pytest"]
