@@ -48,20 +48,20 @@ class ReproducibilityChecker:
         if not build_success:
             reasons.append("Fresh Dockerfile build failed")
 
-        # Gate 3: Fresh verification check
-        if fresh_report:
+        # Gate 3: Fresh verification check - MANDATORY, NO FALLBACK
+        if fresh_report is None:
+            reasons.append("Fresh container verification report is missing (cannot verify clean rebuild)")
+        else:
             if fresh_report.completion_level != OverallVerdict.COMPLETE or fresh_report.overall_status != CheckVerdict.PASS:
                 reasons.append(f"Fresh container verification failed ({fresh_report.overall_status.value}/{fresh_report.completion_level.value})")
-        elif not fresh_report and build_success:
-            # If fresh report is omitted but build succeeded, verify live was complete
-            pass
 
         # Gate 4: Evidence verification
         if not evidence_verified:
-            reasons.append("Evidence bundle manifest hash verification failed")
+            reasons.append("Evidence bundle manifest hash verification failed or evidence is missing")
 
         is_green = (len(reasons) == 0)
 
+        # Must report fresh_report if green, never live_report
         return ReproReport(
             run_id=run_id,
             is_green=is_green,

@@ -27,6 +27,9 @@ class EvidenceGenerator:
         run_cmd: str = "python3 app.py",
         port: Optional[int] = None,
         pinned_sha: Optional[str] = None,
+        source_snapshot_hash: Optional[str] = None,
+        image_digest: Optional[str] = None,
+        build_logs: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Generate all evidence artifacts and return the manifest with SHA-256 hashes."""
         # 1. Dockerfile
@@ -50,12 +53,15 @@ class EvidenceGenerator:
         evidence_data = {
             "run_id": self.run_id,
             "pinned_sha": pinned_sha,
+            "source_snapshot_hash": source_snapshot_hash,
+            "image_digest": image_digest,
             "is_green": verification_report.is_green,
             "overall_status": verification_report.overall_status.value,
             "completion_level": verification_report.completion_level.value,
             "checks": [c.model_dump() for c in verification_report.checks],
             "commands_executed": len(command_ledger),
             "base_image": base_image,
+            "build_logs_present": bool(build_logs),
         }
         evidence_json_path = os.path.join(self.evidence_dir, "evidence.json")
         with open(evidence_json_path, "w", encoding="utf-8") as f:
@@ -78,6 +84,8 @@ class EvidenceGenerator:
             "evidence_dir": self.evidence_dir,
             "manifest": manifest,
             "is_green": verification_report.is_green,
+            "source_snapshot_hash": source_snapshot_hash,
+            "image_digest": image_digest,
         }
 
     def _build_run_md(self, run_id: str, run_cmd: str, port: Optional[int]) -> str:

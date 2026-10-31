@@ -5,9 +5,10 @@ from __future__ import annotations
 import logging
 import os
 import re
+import shutil
 import time
 import uuid
-from typing import Any, Dict, List, Optional, Protocol
+from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 from backend.sandbox.api.schemas import (
     CheckVerdict,
@@ -20,6 +21,11 @@ from backend.sandbox.api.schemas import (
 )
 from backend.sandbox.facade import ExecutionService
 from backend.sandbox.sandbox_manager.docker_client import get_docker_client
+from backend.sandbox.sandbox_manager.profiles import (
+    REPORUNNER_BASE_IMAGE_NODE,
+    REPORUNNER_BASE_IMAGE_PYTHON,
+    get_base_image_digest,
+)
 from backend.verifier.repro.builder import CleanBuilder
 from backend.verifier.repro.checker import ReproducibilityChecker
 from benchmark.schemas import BenchmarkEntry, BenchmarkResult
@@ -74,7 +80,7 @@ class RealExecutionAdapter:
     def execute(self, entry: BenchmarkEntry) -> BenchmarkResult:
         start_time = time.monotonic()
         run_id = f"bench_{entry.id}_{uuid.uuid4().hex[:8]}"
-        base_image = "node:20-slim" if entry.stack == "node" else "python:3.11-slim"
+        base_image = REPORUNNER_BASE_IMAGE_NODE if entry.stack == "node" else REPORUNNER_BASE_IMAGE_PYTHON
         limits = RunLimits(max_steps=self.max_steps, max_seconds=self.timeout_seconds)
 
         service = ExecutionService(run_id=run_id, limits=limits, base_image=base_image)
@@ -116,13 +122,34 @@ class RealExecutionAdapter:
                     details=f"Clone failed: {clone_err}",
                 )
 
-            # Step 2: Inspect workspace and run dependency setup
+            # Step 2: Enforce commit SHA equality
+            if actual_sha and entry.commit_sha and not actual_sha.lower().startswith(entry.commit_sha.lower()):
+                elapsed = time.monotonic() - start_time
+                return BenchmarkResult(
+                    entry_id=entry.id,
+                    repo_url=entry.repo_url,
+                    expected_commit_sha=entry.commit_sha,
+                    actual_commit_sha=actual_sha,
+                    expected_outcome=entry.expected_outcome,
+                    actual_outcome="COMMIT_MISMATCH",
+                    match=False,
+                    execution_steps=1,
+                    wall_clock_duration=round(elapsed, 3),
+                    wall_clock_seconds=round(elapsed, 3),
+                    command_ledger=[],
+                    patch_history=[],
+                    failure_reason=f"Checked out SHA {actual_sha} does not match expected {entry.commit_sha}",
+                    simulated=False,
+                    details="Commit mismatch",
+                )
+
+            # Step 3: Inspect workspace and run dependency setup
             detected_blocker = self._run_setup_and_detect_blockers(service, entry, command_ledger_records)
             if detected_blocker:
                 actual_outcome = "BLOCKED"
                 blocker_reason = detected_blocker
             else:
-                # Step 3: Run independent verification in the live sandbox
+                # Step 4: Run independent verification in the live sandbox
                 logger.info("Executing independent verifier for %s", entry.id)
                 live_report = self._run_verification(service, entry)
                 verification_report_dict = live_report.model_dump()
@@ -131,7 +158,7 @@ class RealExecutionAdapter:
                     live_report.overall_status == CheckVerdict.PASS
                     and live_report.completion_level == OverallVerdict.COMPLETE
                 ):
-                    # Step 4: Reproducibility check - Clean image build & fresh container verification
+                    # Step 5: Reproducibility check - Clean image build & fresh container verification
                     logger.info("Live verification PASSED for %s. Running reproducibility check.", entry.id)
                     repro_ok, repro_details = self._run_reproducibility(service, entry, live_report)
                     fresh_build_dict = repro_details.get("fresh_build")
@@ -156,17 +183,22 @@ class RealExecutionAdapter:
             service.close_run()
 
         elapsed = time.monotonic() - start_time
-        # Ingest command ledger from engine
-        ledger_data = [
-            {
+
+        # Strictly populate command ledger exit codes and durations from execution history
+        ledger_data: List[Dict[str, Any]] = []
+        for req in service.engine.command_ledger:
+            hist_res = service.engine.history.get(req.command_id)
+            if hist_res is None:
+                raise RuntimeError(f"Missing execution evidence for command_id={req.command_id}. Cannot default to success.")
+            ledger_data.append({
                 "command_id": req.command_id,
                 "command": req.command,
-                "exit_code": getattr(req, "exit_code", 0),
-                "duration": getattr(req, "duration", 0.0),
+                "exit_code": hist_res.exit_code,
+                "duration": hist_res.duration,
                 "command_class": req.command_class.value,
-            }
-            for req in service.engine.command_ledger
-        ] or command_ledger_records
+                "status": hist_res.status.value,
+                "error_category": hist_res.error_category.value,
+            })
 
         return BenchmarkResult(
             entry_id=entry.id,
@@ -200,7 +232,6 @@ class RealExecutionAdapter:
         ledger: List[Dict[str, Any]],
     ) -> Optional[str]:
         """Execute setup commands inside sandbox and detect blockers from observed output."""
-        # Check workspace files
         find_req = CommandRequest(
             run_id=service.run_id,
             command_id=f"setup_inspect_{uuid.uuid4().hex[:6]}",
@@ -212,7 +243,6 @@ class RealExecutionAdapter:
         res_find = service.run_command(find_req)
         ledger.append({"cmd": find_req.command, "exit": res_find.exit_code})
 
-        # Stack-specific setup commands
         setup_commands: List[Tuple[str, CommandClass]] = []
         if entry.stack == "python":
             if "requirements.txt" in res_find.stdout:
@@ -225,11 +255,9 @@ class RealExecutionAdapter:
             if "package.json" in res_find.stdout:
                 setup_commands.append(("npm install", CommandClass.INSTALL))
 
-        # If a CLI command or startup test is defined in manifest, run that as a test probe
         if entry.cli_command:
             setup_commands.append((entry.cli_command, CommandClass.TEST))
         elif entry.fault and ("Requires" in entry.fault or "runtime" in entry.fault or "GPU" in entry.fault):
-            # Attempt a minimal test run or import to check for blockers
             if entry.stack == "python":
                 setup_commands.append(("python3 -c 'import torch; print(torch.cuda.is_available()); assert torch.cuda.is_available()'", CommandClass.TEST))
 
@@ -245,10 +273,8 @@ class RealExecutionAdapter:
             res = service.run_command(req)
             ledger.append({"cmd": cmd_str, "exit": res.exit_code, "stdout": res.stdout, "stderr": res.stderr})
 
-            # Check observed output for blockers
             combined_out = f"{res.stderr}\n{res.stdout}"
 
-            # 1. Missing secret / API key
             for p in SECRET_PATTERNS:
                 m = p.search(combined_out)
                 if m:
@@ -256,13 +282,11 @@ class RealExecutionAdapter:
             if res.error_category == ErrorCategory.ENV_VAR_MISSING:
                 return f"Observed missing environment variable required for execution (exit {res.exit_code})"
 
-            # 2. Unavailable hardware / GPU CUDA
             for p in HARDWARE_PATTERNS:
                 m = p.search(combined_out)
                 if m:
                     return f"Observed unavailable hardware requirement: NVIDIA CUDA GPU ({m.group(0)})"
 
-            # 3. Inaccessible private package / repository dependency
             for p in PACKAGE_PATTERNS:
                 m = p.search(combined_out)
                 if m:
@@ -286,28 +310,42 @@ class RealExecutionAdapter:
         live_report: VerificationReport,
     ) -> Tuple[bool, Dict[str, Any]]:
         """
-        Build fresh Docker image from generated Dockerfile and run verification in a new container.
+        Genuine reproducibility pipeline:
+        1. Export exact /workspace source snapshot from container to build context.
+        2. Verify source snapshot hash before building.
+        3. Build clean image from the real repository source and generated Dockerfile.
+        4. Start fresh container from the image without mounting an empty volume over /workspace.
+        5. Execute independent verification against the built project.
+        6. Reject GREEN if fresh verification fails or is incomplete.
         """
         details: Dict[str, Any] = {}
-        # Generate evidence bundle including Dockerfile and manifest
-        bundle = service.build_evidence(
+        build_context_dir = os.path.join("runs", service.run_id, "build_context")
+        os.makedirs(build_context_dir, exist_ok=True)
+
+        # 1. Export actual repository source snapshot from live sandbox
+        source_hash = service.export_workspace(build_context_dir)
+        details["source_snapshot_hash"] = source_hash
+
+        # 2. Build evidence bundle including Dockerfile in evidence dir
+        evidence_bundle = service.build_evidence(
             verification_report=live_report,
             run_cmd=entry.cli_command or "python3 -m unittest discover",
             port=entry.http_port,
+            source_snapshot_hash=source_hash,
         )
-        evidence_dir = bundle.get("evidence_dir")
+        evidence_dir = evidence_bundle.get("evidence_dir")
         details["evidence_directory"] = evidence_dir
 
-        dockerfile_path = os.path.join(evidence_dir, "Dockerfile")
-        if not os.path.exists(dockerfile_path):
-            details["reasons"] = ["Generated Dockerfile missing from evidence bundle"]
-            return False, details
+        # Copy generated Dockerfile into the build context
+        src_dockerfile = os.path.join(evidence_dir, "Dockerfile")
+        dst_dockerfile = os.path.join(build_context_dir, "Dockerfile")
+        shutil.copy2(src_dockerfile, dst_dockerfile)
 
-        # Build clean image
+        # 3. Build clean image from real source context
         fresh_tag = f"repro_{service.run_id}:latest"
-        build_success, build_log, build_dur = CleanBuilder.build_from_path(
-            build_context_path=evidence_dir,
-            dockerfile_path=dockerfile_path,
+        build_success, build_log, build_dur, image_digest = CleanBuilder.build_from_path(
+            build_context_path=build_context_dir,
+            dockerfile_path=dst_dockerfile,
             tag=fresh_tag,
             timeout_s=300,
         )
@@ -315,38 +353,47 @@ class RealExecutionAdapter:
             "success": build_success,
             "duration_s": round(build_dur, 2),
             "image_tag": fresh_tag,
+            "image_digest": image_digest,
         }
 
         if not build_success:
             details["reasons"] = [f"Fresh Docker build failed: {build_log[:200]}"]
             return False, details
 
-        # Verify inside fresh container
+        # 4. Start fresh container from built image WITHOUT mounting an empty volume over /workspace
         fresh_report: Optional[VerificationReport] = None
-        fresh_service = ExecutionService(run_id=f"fresh_{service.run_id}", base_image=fresh_tag)
+        fresh_service = ExecutionService(
+            run_id=f"fresh_{service.run_id}",
+            base_image=fresh_tag,
+            mount_workspace_volume=False,  # DO NOT mount an empty volume over the built /workspace
+        )
         try:
             fresh_service.sandbox.start()
+            # 5. Execute independent verification against the actual built project
             fresh_report = self._run_verification(fresh_service, entry)
             details["fresh_verification"] = fresh_report.model_dump()
         except Exception as fresh_err:
             details["fresh_verification_error"] = str(fresh_err)
+            details["reasons"] = [f"Fresh container startup/verification failed: {fresh_err}"]
+            return False, details
         finally:
             fresh_service.close_run()
-            # Clean up fresh image
+            # Clean up temporary fresh image and build context
             try:
                 client = get_docker_client()
                 client.images.remove(fresh_tag, force=True)
             except Exception:
                 pass
+            shutil.rmtree(build_context_dir, ignore_errors=True)
 
-        # Evaluate GREEN gate
+        # 6. Authoritative GREEN gate evaluation
         repro_report = ReproducibilityChecker.evaluate_green(
             run_id=service.run_id,
             live_report=live_report,
             fresh_report=fresh_report,
             build_success=build_success,
             build_duration_s=build_dur,
-            evidence_verified=bool(bundle.get("manifest")),
+            evidence_verified=bool(evidence_bundle.get("manifest")),
         )
         details["reasons"] = repro_report.reasons
         return repro_report.is_green, details

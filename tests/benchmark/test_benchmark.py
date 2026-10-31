@@ -89,7 +89,7 @@ def test_manifest_contains_seven_fixable_three_blocked():
 
     for entry in runner.entries:
         assert entry.repo_url.startswith("https://github.com/")
-        assert len(entry.commit_sha) >= 7
+        assert len(entry.commit_sha) == 40
 
 
 def test_missing_commit_sha_prevents_benchmark_acceptance():
@@ -106,7 +106,7 @@ benchmarks:
         temp_path = f.name
 
     try:
-        with pytest.raises(ValueError, match="invalid or missing commit_sha"):
+        with pytest.raises(ValueError, match="commit SHA"):
             BenchmarkRunner(manifest_path=temp_path)
     finally:
         if os.path.exists(temp_path):

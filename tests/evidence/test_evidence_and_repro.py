@@ -83,6 +83,7 @@ def test_repro_checker_green_gate():
     res = ReproducibilityChecker.evaluate_green(
         run_id="test_green",
         live_report=v_report,
+        fresh_report=v_report,
         build_success=True,
         evidence_verified=True,
     )

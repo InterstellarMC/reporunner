@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class NetworkManager:
-    """Manages Docker networks for isolated sandbox execution."""
+    """Manages Docker networks for isolated sandbox execution with fail-closed security."""
 
     def __init__(self, run_id: str):
         self.run_id = run_id
@@ -20,7 +20,10 @@ class NetworkManager:
         self.network_name = f"rr_net_{run_id}"
 
     def ensure_network(self, internal: bool = False) -> Network:
-        """Create or get network with run_id label."""
+        """
+        Create or get network with run_id label.
+        Fails closed: NEVER falls back to unrestricted Docker bridge networking.
+        """
         try:
             existing = self.client.networks.list(names=[self.network_name])
             if existing:
@@ -33,9 +36,8 @@ class NetworkManager:
                 labels={"reporunner.run_id": self.run_id},
             )
         except Exception as e:
-            logger.warning("Could not create custom network %s: %s", self.network_name, e)
-            # Fallback to bridge
-            return self.client.networks.get("bridge")
+            logger.error("Failed to create isolated network %s: %s. Failing closed.", self.network_name, e)
+            raise RuntimeError(f"Sandbox network isolation creation failed: {e}. Refusing insecure fallback to bridge.")
 
     def cleanup(self) -> None:
         """Remove network if created."""

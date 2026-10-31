@@ -31,13 +31,28 @@ logger = logging.getLogger(__name__)
 class ExecutionService:
     """The unified Execution and Verification service facade."""
 
-    def __init__(self, run_id: str, limits: Optional[RunLimits] = None, base_image: str = "python:3.11-slim"):
+    def __init__(
+        self,
+        run_id: str,
+        limits: Optional[RunLimits] = None,
+        base_image: str = "python:3.11-slim",
+        mount_workspace_volume: bool = True,
+        read_only_root: bool = False,
+    ):
         self.run_id = run_id
         self.limits = limits or RunLimits()
         self.base_image = base_image
+        self.mount_workspace_volume = mount_workspace_volume
+        self.read_only_root = read_only_root
 
         self.emitter = EventEmitter(run_id=run_id)
-        self.sandbox = SandboxManager(run_id=run_id, base_image=base_image, limits=self.limits)
+        self.sandbox = SandboxManager(
+            run_id=run_id,
+            base_image=base_image,
+            limits=self.limits,
+            mount_workspace_volume=mount_workspace_volume,
+            read_only_root=read_only_root,
+        )
         self.budget = BudgetTracker(run_id=run_id, limits=self.limits)
         self.engine = CommandEngine(sandbox=self.sandbox, budget=self.budget)
         self.workspace = WorkspaceManager(sandbox=self.sandbox)
@@ -251,7 +266,19 @@ class ExecutionService:
             baseline_test_count=baseline_test_count,
         )
 
-    def build_evidence(self, verification_report: VerificationReport, run_cmd: str = "python3 app.py", port: Optional[int] = None) -> Dict[str, Any]:
+    def export_workspace(self, target_dir: str) -> str:
+        """Export exact /workspace snapshot from container to target directory and return tree hash."""
+        return self.sandbox.export_workspace(target_dir)
+
+    def build_evidence(
+        self,
+        verification_report: VerificationReport,
+        run_cmd: str = "python3 app.py",
+        port: Optional[int] = None,
+        source_snapshot_hash: Optional[str] = None,
+        image_digest: Optional[str] = None,
+        build_logs: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """Generate complete evidence bundle including Dockerfile, RUN.md, evidence.json and manifest."""
         from backend.evidence.generator import EvidenceGenerator
         gen = EvidenceGenerator(run_id=self.run_id)
@@ -262,11 +289,22 @@ class ExecutionService:
             run_cmd=run_cmd,
             port=port,
             pinned_sha=self.pinned_sha,
+            source_snapshot_hash=source_snapshot_hash,
+            image_digest=image_digest,
+            build_logs=build_logs,
         )
         self.emitter.emit("evidence.ready", {"evidence_dir": bundle["evidence_dir"], "manifest": bundle["manifest"]})
         return bundle
 
-    def reproduce(self, verification_report: VerificationReport, run_cmd: str = "python3 app.py", port: Optional[int] = None) -> Any:
+    def reproduce(
+        self,
+        verification_report: VerificationReport,
+        fresh_report: Optional[VerificationReport] = None,
+        build_success: bool = True,
+        build_duration_s: float = 0.0,
+        run_cmd: str = "python3 app.py",
+        port: Optional[int] = None,
+    ) -> Any:
         """Run reproducibility check and the GREEN gate."""
         from backend.verifier.repro.checker import ReproducibilityChecker
         self.emitter.emit("repro.build_started", {"run_id": self.run_id})
@@ -274,11 +312,13 @@ class ExecutionService:
         # Generate evidence bundle
         evidence = self.build_evidence(verification_report=verification_report, run_cmd=run_cmd, port=port)
 
-        # Evaluate GREEN gate
+        # Evaluate GREEN gate (fresh_report is mandatory for GREEN)
         repro_report = ReproducibilityChecker.evaluate_green(
             run_id=self.run_id,
             live_report=verification_report,
-            build_success=True,
+            fresh_report=fresh_report,
+            build_success=build_success,
+            build_duration_s=build_duration_s,
             evidence_verified=bool(evidence.get("manifest")),
         )
 

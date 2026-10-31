@@ -8,13 +8,15 @@ import os
 import re
 import time
 from typing import Any, Dict, List, Optional
+import yaml
 
 from benchmark.adapter import ExecutionAdapter, RealExecutionAdapter
 from benchmark.schemas import BenchmarkEntry, BenchmarkResult
 
 logger = logging.getLogger(__name__)
 
-HEX_SHA_REGEX = re.compile(r"^[0-9a-f]{7,40}$", re.IGNORECASE)
+# Enforce exactly 40 hexadecimal characters for full pinned SHAs
+HEX_SHA_REGEX = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
 class BenchmarkRunner:
@@ -37,35 +39,33 @@ class BenchmarkRunner:
         self.entries: List[BenchmarkEntry] = self._load_manifest()
 
     def _load_manifest(self) -> List[BenchmarkEntry]:
-        """Parse and validate manifest entries from YAML."""
+        """Parse and validate manifest entries from YAML using yaml.safe_load."""
         if not os.path.exists(self.manifest_path):
             raise FileNotFoundError(f"Manifest not found: {self.manifest_path}")
 
         with open(self.manifest_path, "r", encoding="utf-8") as f:
-            content = f.read()
+            manifest_dict = yaml.safe_load(f)
 
+        if not manifest_dict or "benchmarks" not in manifest_dict:
+            raise ValueError(f"Invalid manifest: missing 'benchmarks' root list")
+
+        raw_entries = manifest_dict["benchmarks"]
         entries: List[BenchmarkEntry] = []
-        raw_blocks = content.split("- id: ")
-        for block in raw_blocks[1:]:
-            lines = block.strip().splitlines()
-            entry_id = lines[0].strip().strip('"').strip("'")
-            data: Dict[str, Any] = {"id": entry_id}
-            for line in lines[1:]:
-                if ":" in line:
-                    k, v = line.split(":", 1)
-                    k = k.strip()
-                    v = v.strip().strip('"').strip("'")
-                    if v.isdigit():
-                        v = int(v)
-                    data[k] = v
 
-            # Strict validation: commit_sha and repo_url must be present and valid
-            repo_url = data.get("repo_url", "")
-            commit_sha = data.get("commit_sha", "")
+        for data in raw_entries:
+            entry_id = str(data.get("id", ""))
+            repo_url = str(data.get("repo_url", ""))
+            commit_sha = str(data.get("commit_sha", ""))
+
+            # Strict validation: repo_url must start with http/https
             if not repo_url or not (repo_url.startswith("http://") or repo_url.startswith("https://")):
                 raise ValueError(f"Entry {entry_id} has invalid or missing repo_url: '{repo_url}'")
-            if not commit_sha or not HEX_SHA_REGEX.match(str(commit_sha)):
-                raise ValueError(f"Entry {entry_id} has invalid or missing commit_sha: '{commit_sha}'")
+
+            # Strict validation: commit_sha must be exactly 40 hex characters
+            if not commit_sha or len(commit_sha) != 40 or not HEX_SHA_REGEX.match(commit_sha):
+                raise ValueError(
+                    f"Entry {entry_id} must have a 40-character hexadecimal commit SHA, got: '{commit_sha}'"
+                )
 
             entry = BenchmarkEntry(
                 id=entry_id,
@@ -78,7 +78,7 @@ class BenchmarkRunner:
                 cli_command=data.get("cli_command"),
                 expected_outcome=data.get("expected_outcome", "GREEN"),
                 repo_url=repo_url,
-                commit_sha=str(commit_sha),
+                commit_sha=commit_sha,
                 blocker_type=data.get("blocker_type"),
                 blocker_name=data.get("blocker_name"),
             )
@@ -89,7 +89,7 @@ class BenchmarkRunner:
     def validate_manifest(self) -> bool:
         """
         Validate that the manifest has exactly 10 repos (7 fixable, 3 blocked)
-        and every repository has a valid URL and pinned commit SHA.
+        and every repository has a valid URL and pinned 40-char commit SHA.
         """
         if len(self.entries) != 10:
             return False
@@ -101,7 +101,7 @@ class BenchmarkRunner:
         for e in self.entries:
             if not e.repo_url or not e.commit_sha:
                 return False
-            if not HEX_SHA_REGEX.match(e.commit_sha):
+            if len(e.commit_sha) != 40 or not HEX_SHA_REGEX.match(e.commit_sha):
                 return False
 
         return True
