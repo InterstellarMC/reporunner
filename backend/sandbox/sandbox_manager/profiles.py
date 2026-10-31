@@ -87,6 +87,7 @@ def get_container_host_config(limits: RunLimits, read_only_root: bool = False) -
     }
     if read_only_root:
         cfg["read_only"] = True
+        cfg["tmpfs"] = {"/tmp": "rw,noexec,nosuid,size=64m"}
     return cfg
 
 

@@ -68,39 +68,55 @@ class ExecutionService:
 
     def provision_run(self, repo_url: Optional[str] = None, commit_sha: Optional[str] = None) -> Dict[str, Any]:
         """Provision sandbox container and clone repository into workspace volume."""
+        if self.state != "CREATED":
+            raise RuntimeError(
+                f"Cannot provision run: run is already in {self.state} state"
+            )
         logger.info("Provisioning run %s with image %s", self.run_id, self.base_image)
-        self.sandbox.start()
-        self.state = "PROVISIONED"
+        try:
+            self.sandbox.start()
+            self.state = "PROVISIONED"
 
-        if repo_url:
-            success, sha_or_err = self.workspace.clone_repository(repo_url=repo_url, commit_sha=commit_sha)
-            if not success:
-                logger.error("Failed to clone repository: %s", sha_or_err)
-                raise RuntimeError(sha_or_err)
-            self.pinned_sha = sha_or_err
-            if self.workspace.current_snapshot_id:
-                self.current_snapshot_id = self.workspace.current_snapshot_id
-        else:
-            self.current_snapshot_id = "init_snap"
-            self.patch_applier._save_shadow_snapshot(self.current_snapshot_id)
+            if repo_url:
+                success, sha_or_err = self.workspace.clone_repository(repo_url=repo_url, commit_sha=commit_sha)
+                if not success:
+                    logger.error("Failed to clone repository: %s", sha_or_err)
+                    raise RuntimeError(sha_or_err)
+                self.pinned_sha = sha_or_err
+                if self.workspace.current_snapshot_id:
+                    self.current_snapshot_id = self.workspace.current_snapshot_id
+            else:
+                self.current_snapshot_id = "init_snap"
+                self.patch_applier._save_shadow_snapshot(self.current_snapshot_id)
 
-        self.state = "ACTIVE"
-        self.emitter.emit(
-            "run.provisioned",
-            {
+            self.state = "ACTIVE"
+            self.emitter.emit(
+                "run.provisioned",
+                {
+                    "run_id": self.run_id,
+                    "base_image": self.base_image,
+                    "pinned_sha": self.pinned_sha,
+                    "snapshot_id": self.current_snapshot_id,
+                },
+            )
+
+            return {
                 "run_id": self.run_id,
-                "base_image": self.base_image,
                 "pinned_sha": self.pinned_sha,
-                "snapshot_id": self.current_snapshot_id,
-            },
-        )
-
-        return {
-            "run_id": self.run_id,
-            "pinned_sha": self.pinned_sha,
-            "initial_snapshot_id": self.current_snapshot_id,
-            "state": self.state,
-        }
+                "initial_snapshot_id": self.current_snapshot_id,
+                "state": self.state,
+            }
+        except Exception as e:
+            self.state = "FAILED"
+            try:
+                self.sandbox.stop()
+            except Exception as cleanup_err:
+                logger.error("Cleanup failed after provisioning error: %s", cleanup_err)
+                self.emitter.emit(
+                    "sandbox.cleanup_failed",
+                    {"error": str(cleanup_err)},
+                )
+            raise
 
     def run_command(self, req: CommandRequest) -> ExecutionResult:
         """Run repository command through the single choke point."""

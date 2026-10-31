@@ -52,7 +52,46 @@ METADATA_BLACKHOLE_HOSTS: Dict[str, str] = {
     "metadata.goog": "127.0.0.1",
     "instance-data": "127.0.0.1",
     "169.254.169.254": "127.0.0.1",
+    "169.254.169.253": "127.0.0.1",
+    "instance-data.ec2.internal": "127.0.0.1",
+    "host.docker.internal": "127.0.0.1",
+    "metadata": "127.0.0.1",
 }
+
+
+# Explicit runtime network security posture reflecting what Docker enforces vs host requirements
+RUNTIME_NETWORK_SECURITY_POSTURE: Dict[str, bool] = {
+    "inter_container_communication_blocked": True,
+    "metadata_hostnames_blackholed_in_etc_hosts": True,
+    "literal_ip_metadata_blocked_in_docker": False,  # Prerequisite: requires host-level iptables DOCKER-USER rules
+    "private_network_rfc1918_blocked_in_docker": False,  # Prerequisite: requires host-level iptables or external proxy
+    "verification_mode_egress_blocked": True,  # Enforced: internal=True Docker bridge has no gateway
+}
+
+
+def get_host_firewall_recommendations() -> List[str]:
+    """
+    Return recommended host-level firewall rules (iptables) for Docker hosts.
+
+    IMPORTANT DEPLOYMENT PREREQUISITE:
+    This function returns recommendation strings for host administrators. It DOES NOT
+    actively install or enforce firewall rules at runtime. Automated host firewall
+    modification from inside the unprivileged sandbox harness is intentionally disallowed
+    as it would require host root/CAP_NET_ADMIN privileges.
+
+    To enforce literal-IP SSRF protection (e.g. against 169.254.169.254) and internal
+    RFC 1918 traversal during the initial provisioning phase (before container network
+    isolation occurs), the host administrator must apply these rules in the DOCKER-USER
+    chain on the Docker host prior to running untrusted repositories.
+    """
+    return [
+        "iptables -I DOCKER-USER -d 169.254.169.254/32 -j DROP",
+        "iptables -I DOCKER-USER -d 169.254.0.0/16 -j DROP",
+        "# Optional RFC 1918 isolation during setup phase:",
+        "# iptables -I DOCKER-USER -d 10.0.0.0/8 -j DROP",
+        "# iptables -I DOCKER-USER -d 172.16.0.0/12 -j DROP",
+        "# iptables -I DOCKER-USER -d 192.168.0.0/16 -j DROP",
+    ]
 
 
 class NetworkManager:

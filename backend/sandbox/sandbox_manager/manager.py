@@ -27,6 +27,17 @@ from backend.sandbox.workspace.snapshots import SnapshotStore
 logger = logging.getLogger(__name__)
 
 
+def validate_mount_targets(volumes: Dict[str, Any]) -> None:
+    """
+    Validate that all volume mounts target approved directories only.
+    Rejects any host bind mount outside APPROVED_MOUNT_TARGETS before container creation.
+    """
+    for vol_info in volumes.values():
+        bind_target = vol_info.get("bind")
+        if bind_target not in APPROVED_MOUNT_TARGETS:
+            raise PermissionError(f"Forbidden mount path: '{bind_target}'. Only {APPROVED_MOUNT_TARGETS} permitted.")
+
+
 class SandboxManager:
     """Manages the Docker container, network, and volume lifecycle for a single run_id."""
 
@@ -66,10 +77,7 @@ class SandboxManager:
             volumes[self.volume_name] = {"bind": DEFAULT_WORKSPACE_DIR, "mode": "rw"}
 
         # Validate mounts against approved targets
-        for vol_info in volumes.values():
-            bind_target = vol_info.get("bind")
-            if bind_target not in APPROVED_MOUNT_TARGETS:
-                raise PermissionError(f"Forbidden mount path: '{bind_target}'. Only {APPROVED_MOUNT_TARGETS} permitted.")
+        validate_mount_targets(volumes)
 
         # 2. Host config and limits
         host_config = get_container_host_config(self.limits, read_only_root=self.read_only_root)
@@ -120,13 +128,22 @@ class SandboxManager:
                 "chmod 700 /workspace/.shadow_snapshots; "
                 "chmod 1777 /tmp'"
             )
-            try:
-                code, out = self.container.exec_run(cmd=init_cmd, user="0")
-                if code != 0:
-                    raise RuntimeError(f"Container initialization exited with code {code}: {out}")
-            except Exception as init_err:
-                self.stop()
-                raise RuntimeError(f"Sandbox initialization failed; refusing to start: {init_err}") from init_err
+        else:
+            init_cmd = (
+                "sh -eu -c '"
+                "mkdir -p /tmp /workspace/.shadow_snapshots; "
+                "chown -R 10001:10001 /workspace /tmp; "
+                "chmod 755 /workspace; "
+                "chmod 700 /workspace/.shadow_snapshots; "
+                "chmod 1777 /tmp'"
+            )
+        try:
+            code, out = self.container.exec_run(cmd=init_cmd, user="0")
+            if code != 0:
+                raise RuntimeError(f"Container initialization exited with code {code}: {out}")
+        except Exception as init_err:
+            self.stop()
+            raise RuntimeError(f"Sandbox initialization failed; refusing to start: {init_err}") from init_err
 
         self.is_running = True
         return self.container

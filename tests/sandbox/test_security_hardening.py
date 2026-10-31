@@ -4,9 +4,23 @@ import pytest
 from unittest.mock import MagicMock, patch
 import docker
 
-from backend.sandbox.api.schemas import RunLimits
-from backend.sandbox.sandbox_manager.manager import SandboxManager
-from backend.sandbox.sandbox_manager.network import NetworkManager, METADATA_BLACKHOLE_HOSTS
+from backend.sandbox.api.schemas import (
+    CheckVerdict,
+    CommandRequest,
+    OverallVerdict,
+    PatchProposal,
+    PatchStatus,
+    RunLimits,
+    VerificationReport,
+)
+from backend.sandbox.facade import ExecutionService
+from backend.sandbox.sandbox_manager.manager import SandboxManager, validate_mount_targets
+from backend.sandbox.sandbox_manager.network import (
+    NetworkManager,
+    METADATA_BLACKHOLE_HOSTS,
+    RUNTIME_NETWORK_SECURITY_POSTURE,
+    get_host_firewall_recommendations,
+)
 from backend.sandbox.sandbox_manager.profiles import (
     get_container_host_config,
     parse_memory_limit,
@@ -139,7 +153,6 @@ def test_network_isolation_switching_real_docker():
     finally:
         sandbox.stop()
 
-
 def test_git_safe_directory_scoped_no_wildcard():
     """Verify that safe.directory has no global wildcard '*' and is scoped only to required paths."""
     sandbox = SandboxManager(run_id="test_safe_dir", base_image="reporunner-python:3.11-git1")
@@ -155,7 +168,6 @@ def test_git_safe_directory_scoped_no_wildcard():
         assert "/tmp/reporunner-repository-clone" in entries
     finally:
         sandbox.stop()
-
 
 # ============================================================================
 # 2. Workspace Permissions & Ownership (Least Privilege, No 777)
@@ -183,7 +195,6 @@ def test_workspace_permissions_and_no_chmod_777():
     finally:
         sandbox.stop()
 
-
 def test_temporary_clone_dir_cleaned_up_after_clone():
     """Verify /tmp/reporunner-repository-clone does not persist in the container."""
     sandbox = SandboxManager(run_id="test_temp_cleanup", base_image="reporunner-python:3.11-git1")
@@ -201,7 +212,6 @@ def test_temporary_clone_dir_cleaned_up_after_clone():
         assert code != 0, "Temporary clone directory was not cleaned up after clone failure"
     finally:
         sandbox.stop()
-
 
 # ============================================================================
 # 3. Git Commit Verification & Ambiguity Protection
@@ -257,7 +267,6 @@ def test_exact_40_char_sha_mismatch_rejected():
             assert "Pinned SHA mismatch" in err
     finally:
         sandbox.stop()
-
 
 # ============================================================================
 # 4. CPU & Memory Limits Validation and Enforcement
@@ -453,3 +462,341 @@ def test_existing_secure_network_is_reused(internal):
         result = mgr.ensure_network(internal=internal)
 
     assert result is existing_network
+
+
+# ============================================================================
+# 7. Metadata SSRF and Host Firewall Policy Audit (Priority 1)
+# ============================================================================
+
+def test_metadata_blackhole_hosts_configuration_coverage():
+    """
+    Verify configuration: ensure metadata hostnames are mapped to 127.0.0.1 in extra_hosts.
+    Note: This configures hostname resolution (/etc/hosts) only, NOT literal-IP routing.
+    """
+    required_hosts = [
+        "metadata.google.internal",
+        "metadata.goog",
+        "instance-data",
+        "169.254.169.254",
+        "169.254.169.253",
+        "instance-data.ec2.internal",
+        "host.docker.internal",
+        "metadata",
+    ]
+    for host in required_hosts:
+        assert host in METADATA_BLACKHOLE_HOSTS, f"Missing {host} in blackhole list"
+        assert METADATA_BLACKHOLE_HOSTS[host] == "127.0.0.1"
+
+
+def test_runtime_network_security_posture_marks_literal_ip_as_unsupported_without_host_rules():
+    """Verify runtime posture honestly reflects that literal-IP SSRF requires host-level firewall."""
+    assert RUNTIME_NETWORK_SECURITY_POSTURE["inter_container_communication_blocked"] is True
+    assert RUNTIME_NETWORK_SECURITY_POSTURE["metadata_hostnames_blackholed_in_etc_hosts"] is True
+    assert RUNTIME_NETWORK_SECURITY_POSTURE["literal_ip_metadata_blocked_in_docker"] is False
+    assert RUNTIME_NETWORK_SECURITY_POSTURE["private_network_rfc1918_blocked_in_docker"] is False
+    assert RUNTIME_NETWORK_SECURITY_POSTURE["verification_mode_egress_blocked"] is True
+
+
+def test_host_firewall_recommendations_coverage():
+    """Verify host-level firewall recommendations document required DOCKER-USER rules."""
+    rules = get_host_firewall_recommendations()
+    assert any("169.254.169.254" in r for r in rules)
+    assert any("169.254.0.0/16" in r for r in rules)
+    assert any("DOCKER-USER" in r for r in rules)
+
+
+# ============================================================================
+# 8. Verification Lifecycle & State Machine Hardening (Priority 2)
+# ============================================================================
+
+def test_cannot_provision_run_twice():
+    """Calling provision_run on an already provisioned/active run must fail closed."""
+    service = ExecutionService(run_id="test_reprovision")
+    service.state = "ACTIVE"
+    with pytest.raises(RuntimeError, match="already in ACTIVE state"):
+        service.provision_run()
+
+
+def test_provision_run_clone_failure_fails_closed_and_cleans_up():
+    """Repository clone failure must set state to FAILED, clean up sandbox, and preserve error."""
+    service = ExecutionService(run_id="test_prov_clone_fail")
+    assert service.state == "CREATED"
+
+    with patch.object(service.sandbox, "start") as mock_start:
+        with patch.object(service.workspace, "clone_repository", return_value=(False, "Git clone network timeout")):
+            with patch.object(service.sandbox, "stop") as mock_stop:
+                with pytest.raises(RuntimeError, match="Git clone network timeout"):
+                    service.provision_run(repo_url="https://github.com/org/repo.git")
+
+                assert service.state == "FAILED"
+                mock_start.assert_called_once()
+                mock_stop.assert_called_once()
+
+
+def test_provision_run_snapshot_failure_fails_closed_and_cleans_up():
+    """Snapshot initialization failure must set state to FAILED, clean up sandbox, and preserve error."""
+    service = ExecutionService(run_id="test_prov_snap_fail")
+    assert service.state == "CREATED"
+
+    with patch.object(service.sandbox, "start") as mock_start:
+        with patch.object(service.patch_applier, "_save_shadow_snapshot", side_effect=OSError("Shadow snapshot disk full")):
+            with patch.object(service.sandbox, "stop") as mock_stop:
+                with pytest.raises(OSError, match="Shadow snapshot disk full"):
+                    service.provision_run()  # No repo_url triggers initial shadow snapshot path
+
+                assert service.state == "FAILED"
+                mock_start.assert_called_once()
+                mock_stop.assert_called_once()
+
+
+def test_provision_run_cleanup_failure_does_not_mask_original_error():
+    """If sandbox cleanup raises after a provisioning failure, the original failure is preserved."""
+    service = ExecutionService(run_id="test_prov_cleanup_mask")
+    assert service.state == "CREATED"
+
+    with patch.object(service.sandbox, "start"):
+        with patch.object(service.workspace, "clone_repository", return_value=(False, "Original clone error")):
+            with patch.object(service.sandbox, "stop", side_effect=RuntimeError("Cleanup daemon failure")):
+                # Original clone error must be raised, NOT the cleanup error
+                with pytest.raises(RuntimeError, match="Original clone error"):
+                    service.provision_run(repo_url="https://github.com/org/repo.git")
+
+                assert service.state == "FAILED"
+
+
+def test_verification_cannot_start_on_stopped_sandbox():
+    """Verification must fail if the sandbox container is not running."""
+    service = ExecutionService(run_id="test_verify_stopped")
+    service.state = "ACTIVE"
+    service.sandbox.is_running = False
+    with pytest.raises(RuntimeError, match="Cannot verify: sandbox is not running"):
+        service.verify()
+
+
+def test_verification_cannot_be_restarted_after_completion():
+    """A completed or verifying run cannot be verified again."""
+    service = ExecutionService(run_id="test_double_verify")
+    service.state = "VERIFIED"
+    service.sandbox.is_running = True
+    service.sandbox.container = MagicMock()
+    with pytest.raises(RuntimeError, match="Verification is not permitted while run is VERIFIED"):
+        service.verify()
+
+
+def test_verification_isolation_failure_stops_sandbox_and_sets_failed():
+    """If network isolation fails during verify, sandbox must be stopped and state set to FAILED."""
+    service = ExecutionService(run_id="test_verify_iso_fail")
+    service.state = "ACTIVE"
+    service.sandbox.is_running = True
+    service.sandbox.container = MagicMock()
+
+    with patch.object(
+        service.sandbox.network_manager,
+        "isolate_container",
+        side_effect=RuntimeError("Docker isolation network disconnect failed"),
+    ):
+        with patch.object(service.sandbox, "stop") as mock_stop:
+            with pytest.raises(RuntimeError, match="Verification aborted because network isolation failed"):
+                service.verify()
+
+            assert service.state == "FAILED"
+            mock_stop.assert_called_once()
+
+
+def test_ordinary_commands_and_patches_rejected_after_verification_starts():
+    """Commands, patches, rollbacks, and background processes must be rejected during/after verification."""
+    service = ExecutionService(run_id="test_reject_after_verify")
+    service.state = "VERIFYING"
+
+    # 1. run_command rejected
+    cmd_req = CommandRequest(
+        run_id="test_reject_after_verify",
+        command_id="cmd_post_verify",
+        command="echo forbidden",
+    )
+    with pytest.raises(RuntimeError, match="Command execution is not permitted while run is VERIFYING"):
+        service.run_command(cmd_req)
+
+    # 2. validate_patch rejected
+    patch_prop = PatchProposal(
+        patch_id="p1",
+        run_id="test_reject_after_verify",
+        base_snapshot_id="snap1",
+        origin="orchestrator",
+    )
+    val_res = service.validate_patch(patch_prop)
+    assert val_res is not None
+    assert val_res.status == PatchStatus.REJECTED
+
+    # 3. apply_patch rejected
+    apply_res = service.apply_patch(patch_prop)
+    assert apply_res.status == PatchStatus.REJECTED
+
+    # 4. rollback rejected
+    rb_res = service.rollback("snap1")
+    assert rb_res.status == "FAILED"
+
+    # 5. start_process rejected
+    started, msg = service.start_process("proc1", "python3 -m http.server")
+    assert started is False
+    assert "Cannot start a background process while run is VERIFYING" in msg
+
+
+def test_fresh_reproducibility_verification_lifecycle():
+    """Fresh container started directly in CREATED state can verify and reaches VERIFIED state."""
+    service = ExecutionService(run_id="test_fresh_repro_lifecycle", mount_workspace_volume=False)
+    assert service.state == "CREATED"
+
+    # Mock container running
+    service.sandbox.is_running = True
+    service.sandbox.container = MagicMock()
+
+    mock_report = VerificationReport(
+        run_id="test_fresh_repro_lifecycle",
+        overall_status=CheckVerdict.PASS,
+        completion_level=OverallVerdict.COMPLETE,
+        is_green=True,
+        checks=[],
+    )
+
+    with patch.object(service.sandbox.network_manager, "isolate_container") as mock_iso:
+        with patch("backend.verifier.engine.VerificationEngine.verify", return_value=mock_report):
+            report = service.verify()
+            assert report.overall_status == CheckVerdict.PASS
+            assert service.state == "VERIFIED"
+            mock_iso.assert_called_once_with(service.sandbox.container)
+
+
+# ============================================================================
+# 9. Loopback and Application Verification Compatibility (Priority 3)
+# ============================================================================
+
+def test_loopback_preserved_in_real_isolated_docker():
+    """Prove that 127.0.0.1 (loopback) remains accessible after network isolation."""
+    sandbox = SandboxManager(run_id="test_loopback_iso", base_image="reporunner-python:3.11-git1")
+    try:
+        cont = sandbox.start()
+        # Perform network isolation
+        sandbox.network_manager.isolate_container(cont)
+
+        # Execute loopback HTTP server and client test entirely inside isolated container
+        py_test_cmd = (
+            "python3 -c \""
+            "import http.server, threading, urllib.request; "
+            "server = http.server.HTTPServer(('127.0.0.1', 9988), http.server.SimpleHTTPRequestHandler); "
+            "t = threading.Thread(target=server.serve_forever, daemon=True); "
+            "t.start(); "
+            "resp = urllib.request.urlopen('http://127.0.0.1:9988', timeout=5); "
+            "assert resp.status == 200; "
+            "server.shutdown(); "
+            "print('LOOPBACK_HTTP_SUCCESS')\""
+        )
+        code, out, _ = sandbox.exec_in_sandbox(py_test_cmd, timeout_s=15)
+        assert code == 0, f"Loopback check failed in isolated container: {out.decode('utf-8')}"
+        assert b"LOOPBACK_HTTP_SUCCESS" in out
+    finally:
+        sandbox.stop()
+
+# ============================================================================
+# 10. Resource and Container Hardening Audit (Priority 4)
+# ============================================================================
+
+def test_read_only_root_configures_tmpfs():
+    """Verify that read_only_root enables read_only flag and writable tmpfs for /tmp."""
+    limits = RunLimits(memory_limit="256m", cpu_limit=1.0, pids_limit=100)
+    cfg = get_container_host_config(limits, read_only_root=True)
+    assert cfg.get("read_only") is True
+    assert "tmpfs" in cfg
+    assert "/tmp" in cfg["tmpfs"]
+    assert "rw" in cfg["tmpfs"]["/tmp"]
+
+
+def test_container_host_config_security_options():
+    """Verify host configuration drops ALL capabilities, enables no-new-privileges, and locks swap."""
+    limits = RunLimits(memory_limit="512m", cpu_limit=2.0, pids_limit=200)
+    cfg = get_container_host_config(limits)
+    assert cfg["cap_drop"] == ["ALL"]
+    assert "no-new-privileges:true" in cfg["security_opt"]
+    assert cfg["memswap_limit"] == cfg["mem_limit"]  # Swap disabled/equal to mem
+    assert cfg["nano_cpus"] == 2_000_000_000
+
+
+def test_production_mount_validation_accepts_approved_mount():
+    """Prove production validate_mount_targets accepts approved /workspace volume mount."""
+    valid_vols = {"rr_vol_123": {"bind": "/workspace", "mode": "rw"}}
+    validate_mount_targets(valid_vols)  # Must not raise
+
+
+@pytest.mark.parametrize("forbidden_bind", [
+    "/var/run/docker.sock",
+    "/etc",
+    "/root",
+    "/host",
+    "/dev",
+])
+def test_production_mount_validation_rejects_unapproved_mounts(forbidden_bind):
+    """Prove production validate_mount_targets strictly rejects unapproved mounts."""
+    invalid_vols = {"bad_vol": {"bind": forbidden_bind, "mode": "rw"}}
+    with pytest.raises(PermissionError, match="Forbidden mount path"):
+        validate_mount_targets(invalid_vols)
+
+
+def test_sandbox_start_rejects_unapproved_mount_before_container_creation():
+    """Prove unapproved mount rejection occurs before Docker creates or starts a container."""
+    sandbox = SandboxManager(run_id="test_mount_rejection_order")
+    # Patch volume creation to inject a forbidden bind target into volumes
+    with patch.object(sandbox.client.volumes, "create", return_value=MagicMock()):
+        with patch("backend.sandbox.sandbox_manager.manager.DEFAULT_WORKSPACE_DIR", "/forbidden/host/path"):
+            with patch.object(sandbox.client.containers, "create") as mock_cont_create:
+                with pytest.raises(PermissionError, match="Forbidden mount path"):
+                    sandbox.start()
+                # Crucial security invariant: container create must NEVER be called
+                mock_cont_create.assert_not_called()
+
+
+def test_read_only_root_runtime_enforcement():
+    """
+    Real Docker runtime test proving read_only_root enforces:
+    - Root filesystem (/) is read-only.
+    - /tmp is writable tmpfs.
+    - /tmp is mounted with noexec (scripts in /tmp cannot execute).
+    - /workspace volume is writable.
+    - Standard commands and Python execution succeed in /workspace.
+    """
+    sandbox = SandboxManager(
+        run_id="test_ro_runtime",
+        base_image="reporunner-python:3.11-git1",
+        read_only_root=True,
+    )
+    try:
+        sandbox.start()
+
+        # 1. Root filesystem (/) is strictly read-only
+        code_root, out_root, _ = sandbox.exec_in_sandbox(["touch", "/test_root_file"], user="0")
+        assert code_root != 0, "Writing to root filesystem unexpectedly succeeded on read-only root"
+        assert b"Read-only file system" in out_root
+
+        # 2. /tmp is writable
+        code_tmp_w, _, _ = sandbox.exec_in_sandbox(["touch", "/tmp/test_tmp_file"])
+        assert code_tmp_w == 0, "/tmp was not writable"
+
+        # 3. /tmp is mounted with noexec (executing script in /tmp must be denied)
+        sandbox.exec_in_sandbox("echo '#!/bin/sh\necho NOEXEC_FAILED' > /tmp/bad.sh && chmod +x /tmp/bad.sh")
+        code_noexec, out_noexec, _ = sandbox.exec_in_sandbox(["/tmp/bad.sh"])
+        assert code_noexec != 0, "Execution of script in /tmp unexpectedly succeeded on noexec mount"
+        assert b"Permission denied" in out_noexec or code_noexec == 126
+
+        # 4. /workspace volume is writable
+        code_ws_w, _, _ = sandbox.exec_in_sandbox(["touch", "/workspace/test_ws_file"])
+        assert code_ws_w == 0, "/workspace was not writable"
+
+        # 5. Commands and Python execution work properly in /workspace
+        code_py, out_py, _ = sandbox.exec_in_sandbox(
+            ["python3", "-c", "print('RUNNER_WORKSPACE_OK')"],
+            workdir="/workspace",
+        )
+        assert code_py == 0
+        assert b"RUNNER_WORKSPACE_OK" in out_py
+
+    finally:
+        sandbox.stop()
