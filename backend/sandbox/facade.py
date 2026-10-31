@@ -17,6 +17,10 @@ from backend.sandbox.api.schemas import (
 from backend.sandbox.exec.background import BackgroundProcessManager
 from backend.sandbox.exec.engine import CommandEngine
 from backend.sandbox.exec.limits import BudgetTracker
+from backend.sandbox.patch.applier import PatchApplier
+from backend.sandbox.patch.history import PatchHistory
+from backend.sandbox.patch.rollback import PatchRollbackService
+from backend.sandbox.patch.validator import PatchValidator
 from backend.sandbox.sandbox_manager.manager import SandboxManager
 from backend.sandbox.workspace.manager import WorkspaceManager
 
@@ -37,9 +41,13 @@ class ExecutionService:
         self.workspace = WorkspaceManager(sandbox=self.sandbox)
         self.bg_process = BackgroundProcessManager(sandbox=self.sandbox)
 
+        self.patch_history = PatchHistory(run_id=run_id)
+        self.patch_applier = PatchApplier(sandbox=self.sandbox, history=self.patch_history)
+        self.patch_rollback = PatchRollbackService(sandbox=self.sandbox)
+
         self.state = "CREATED"
         self.pinned_sha: Optional[str] = None
-        self.initial_snapshot_id: Optional[str] = None
+        self.current_snapshot_id: str = "init"
 
     def provision_run(self, repo_url: Optional[str] = None, commit_sha: Optional[str] = None) -> Dict[str, Any]:
         """Provision sandbox container and clone repository into workspace volume."""
@@ -53,19 +61,50 @@ class ExecutionService:
                 logger.error("Failed to clone repository: %s", sha_or_err)
                 raise RuntimeError(sha_or_err)
             self.pinned_sha = sha_or_err
-            self.initial_snapshot_id = self.workspace.current_snapshot_id
+            if self.workspace.current_snapshot_id:
+                self.current_snapshot_id = self.workspace.current_snapshot_id
+        else:
+            # Create initial placeholder snapshot in empty workspace
+            self.current_snapshot_id = "init_snap"
+            self.patch_applier._save_shadow_snapshot(self.current_snapshot_id)
 
         self.state = "ACTIVE"
         return {
             "run_id": self.run_id,
             "pinned_sha": self.pinned_sha,
-            "initial_snapshot_id": self.initial_snapshot_id,
+            "initial_snapshot_id": self.current_snapshot_id,
             "state": self.state,
         }
 
     def run_command(self, req: CommandRequest) -> ExecutionResult:
         """Run repository command through the single choke point."""
         return self.engine.execute(req)
+
+    def validate_patch(self, proposal: PatchProposal) -> Optional[PatchResult]:
+        """Validate patch proposal without applying it."""
+        return PatchValidator.validate(
+            proposal=proposal,
+            current_snapshot_id=self.current_snapshot_id,
+            run_is_active=(self.state == "ACTIVE"),
+        )
+
+    def apply_patch(self, proposal: PatchProposal) -> PatchResult:
+        """Apply patch atomically; updates current_snapshot_id on success."""
+        res = self.patch_applier.apply(
+            proposal=proposal,
+            current_snapshot_id=self.current_snapshot_id,
+            is_active=(self.state == "ACTIVE"),
+        )
+        if res.status == PatchStatus.APPLIED and res.new_snapshot_id:
+            self.current_snapshot_id = res.new_snapshot_id
+        return res
+
+    def rollback(self, target_snapshot_id: str) -> RollbackResult:
+        """Roll back workspace to target snapshot ID."""
+        res = self.patch_rollback.rollback(self.run_id, target_snapshot_id)
+        if res.status == "SUCCESS":
+            self.current_snapshot_id = target_snapshot_id
+        return res
 
     def start_process(
         self,
@@ -98,7 +137,7 @@ class ExecutionService:
             "elapsed_seconds": round(self.budget.elapsed_seconds, 2),
             "command_ledger_len": len(self.engine.command_ledger),
             "pinned_sha": self.pinned_sha,
-            "current_snapshot_id": self.workspace.current_snapshot_id,
+            "current_snapshot_id": self.current_snapshot_id,
         }
 
     def close_run(self) -> None:

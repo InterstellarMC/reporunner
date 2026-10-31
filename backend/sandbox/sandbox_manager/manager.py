@@ -80,12 +80,13 @@ class SandboxManager:
 
         self.container.start()
 
-        # Set up runner user and workspace ownership inside the container
+        # Set up permissions for non-root runner user (UID 10001) inside the container
         init_cmd = (
-            "sh -c 'groupadd -g 10001 runner 2>/dev/null || true; "
-            "useradd -u 10001 -g 10001 -d /home/runner -m runner 2>/dev/null || true; "
-            "chown -R 10001:10001 /workspace /home/runner 2>/dev/null || true; "
-            "chmod -R 775 /workspace 2>/dev/null || true'"
+            "sh -c '"
+            "grep -q runner /etc/passwd || echo runner:x:10001:10001:runner:/home/runner:/bin/sh >> /etc/passwd; "
+            "grep -q runner /etc/group || echo runner:x:10001: >> /etc/group; "
+            "mkdir -p /home/runner /tmp /workspace/.shadow_snapshots; "
+            "chmod 777 /workspace /tmp /home/runner /workspace/.shadow_snapshots 2>/dev/null || true'"
         )
         self.container.exec_run(cmd=init_cmd, user="0")
 
