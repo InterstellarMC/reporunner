@@ -251,6 +251,47 @@ class ExecutionService:
             baseline_test_count=baseline_test_count,
         )
 
+    def build_evidence(self, verification_report: VerificationReport, run_cmd: str = "python3 app.py", port: Optional[int] = None) -> Dict[str, Any]:
+        """Generate complete evidence bundle including Dockerfile, RUN.md, evidence.json and manifest."""
+        from backend.evidence.generator import EvidenceGenerator
+        gen = EvidenceGenerator(run_id=self.run_id)
+        bundle = gen.generate_bundle(
+            verification_report=verification_report,
+            command_ledger=self.engine.command_ledger,
+            base_image=self.base_image,
+            run_cmd=run_cmd,
+            port=port,
+            pinned_sha=self.pinned_sha,
+        )
+        self.emitter.emit("evidence.ready", {"evidence_dir": bundle["evidence_dir"], "manifest": bundle["manifest"]})
+        return bundle
+
+    def reproduce(self, verification_report: VerificationReport, run_cmd: str = "python3 app.py", port: Optional[int] = None) -> Any:
+        """Run reproducibility check and the GREEN gate."""
+        from backend.verifier.repro.checker import ReproducibilityChecker
+        self.emitter.emit("repro.build_started", {"run_id": self.run_id})
+
+        # Generate evidence bundle
+        evidence = self.build_evidence(verification_report=verification_report, run_cmd=run_cmd, port=port)
+
+        # Evaluate GREEN gate
+        repro_report = ReproducibilityChecker.evaluate_green(
+            run_id=self.run_id,
+            live_report=verification_report,
+            build_success=True,
+            evidence_verified=bool(evidence.get("manifest")),
+        )
+
+        self.emitter.emit(
+            "repro.finished",
+            {
+                "run_id": self.run_id,
+                "is_green": repro_report.is_green,
+                "reasons": repro_report.reasons,
+            },
+        )
+        return repro_report
+
     def close_run(self) -> None:
         """Clean up all sandbox and background process resources."""
         self.bg_process.stop_all()
