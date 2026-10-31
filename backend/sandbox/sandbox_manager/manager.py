@@ -14,7 +14,7 @@ from docker.models.volumes import Volume
 
 from backend.sandbox.api.schemas import RunLimits
 from backend.sandbox.sandbox_manager.docker_client import get_docker_client
-from backend.sandbox.sandbox_manager.network import NetworkManager
+from backend.sandbox.sandbox_manager.network import NetworkManager, METADATA_BLACKHOLE_HOSTS
 from backend.sandbox.sandbox_manager.profiles import (
     APPROVED_MOUNT_TARGETS,
     DEFAULT_SANDBOX_USER,
@@ -74,42 +74,59 @@ class SandboxManager:
         # 2. Host config and limits
         host_config = get_container_host_config(self.limits, read_only_root=self.read_only_root)
 
-        # 3. Create long-running container
+        # 3. Create isolated network (fail-closed: must succeed before container creation)
+        try:
+            net = self.network_manager.ensure_network(internal=False)
+        except Exception as net_err:
+            self.stop()
+            logger.error("Failed to provision isolated network: %s. Failing closed.", net_err)
+            raise RuntimeError(f"Sandbox container startup failed during network provisioning: {net_err}") from net_err
+
+        # 4. Create long-running container attached ONLY to the isolated network
         labels = {
             "reporunner.run_id": self.run_id,
             "reporunner.role": "sandbox",
         }
 
-        self.container = self.client.containers.create(
-            image=self.base_image,
-            command=["tail", "-f", "/dev/null"],
-            name=self.container_name,
-            working_dir=DEFAULT_WORKSPACE_DIR,
-            volumes=volumes,
-            labels=labels,
-            detach=True,
-            **host_config,
-        )
-
-        # 4. Connect to isolated network (fail-closed)
         try:
-            net = self.network_manager.ensure_network()
-            net.connect(self.container)
-        except Exception as net_err:
-            logger.warning("Network connection warning: %s", net_err)
-
-        self.container.start()
+            self.container = self.client.containers.create(
+                image=self.base_image,
+                command=["tail", "-f", "/dev/null"],
+                name=self.container_name,
+                working_dir=DEFAULT_WORKSPACE_DIR,
+                volumes=volumes,
+                network=net.name,
+                extra_hosts=METADATA_BLACKHOLE_HOSTS,
+                labels=labels,
+                detach=True,
+                **host_config,
+            )
+            self.container.start()
+        except Exception as e:
+            self.stop()
+            logger.error("Container creation or startup failed: %s. Failing closed.", e)
+            raise RuntimeError(f"Sandbox container creation/start failed: {e}") from e
 
         # Set up permissions for non-root runner user (UID 10001) inside container
+        # Use least-privilege permissions: runner owns /workspace (755) and snapshots (700); /tmp (1777)
         if not self.read_only_root:
             init_cmd = (
-                "sh -c '"
+                "sh -eu -c '"
                 "grep -q runner /etc/passwd || echo runner:x:10001:10001:runner:/home/runner:/bin/sh >> /etc/passwd; "
                 "grep -q runner /etc/group || echo runner:x:10001: >> /etc/group; "
                 "mkdir -p /home/runner /tmp /workspace/.shadow_snapshots; "
-                "chmod 777 /workspace /tmp /home/runner /workspace/.shadow_snapshots 2>/dev/null || true'"
+                "chown -R 10001:10001 /workspace /home/runner; "
+                "chmod 755 /workspace /home/runner; "
+                "chmod 700 /workspace/.shadow_snapshots; "
+                "chmod 1777 /tmp'"
             )
-            self.container.exec_run(cmd=init_cmd, user="0")
+            try:
+                code, out = self.container.exec_run(cmd=init_cmd, user="0")
+                if code != 0:
+                    raise RuntimeError(f"Container initialization exited with code {code}: {out}")
+            except Exception as init_err:
+                self.stop()
+                raise RuntimeError(f"Sandbox initialization failed; refusing to start: {init_err}") from init_err
 
         self.is_running = True
         return self.container

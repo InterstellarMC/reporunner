@@ -104,6 +104,22 @@ class ExecutionService:
 
     def run_command(self, req: CommandRequest) -> ExecutionResult:
         """Run repository command through the single choke point."""
+        if self.state != "ACTIVE":
+            raise RuntimeError(
+                f"Command execution is not permitted while run is {self.state}"
+            )
+        return self._execute_command(req)
+
+    def _run_verification_command(self, req: CommandRequest) -> ExecutionResult:
+        """Execute a verifier command only during isolated verification."""
+        if self.state != "VERIFYING":
+            raise RuntimeError(
+                f"Verifier command execution is not permitted while run is {self.state}"
+            )
+        return self._execute_command(req)
+
+    def _execute_command(self, req: CommandRequest) -> ExecutionResult:
+        """Shared policy-enforced command execution and event emission."""
         self.emitter.emit(
             "command.started",
             {
@@ -181,6 +197,14 @@ class ExecutionService:
 
     def rollback(self, target_snapshot_id: str) -> RollbackResult:
         """Roll back workspace to target snapshot ID."""
+        if self.state != "ACTIVE":
+            return RollbackResult(
+                run_id=self.run_id,
+                target_snapshot_id=target_snapshot_id,
+                status="FAILED",
+                restored_snapshot_id="FAILED",
+                removed_files=[],
+            )
         res = self.patch_rollback.rollback(self.run_id, target_snapshot_id)
         if res.status == "SUCCESS":
             self.current_snapshot_id = target_snapshot_id
@@ -199,6 +223,8 @@ class ExecutionService:
         timeout_s: int = 30,
     ) -> Tuple[bool, str]:
         """Start long-running server in background."""
+        if self.state != "ACTIVE":
+            return False, f"Cannot start a background process while run is {self.state}"
         success, msg = self.bg_process.start_process(
             process_id=process_id,
             cmd=cmd,
@@ -228,6 +254,7 @@ class ExecutionService:
             "current_snapshot_id": self.current_snapshot_id,
         }
 
+
     def verify(
         self,
         entrypoint: Optional[str] = None,
@@ -236,8 +263,35 @@ class ExecutionService:
         cli_command: Optional[str] = None,
         baseline_test_count: Optional[int] = None,
     ) -> VerificationReport:
-        """Run independent rule-based verification checks over the workspace."""
+        """Run independent verification after isolating repository network access."""
         from backend.verifier.engine import VerificationEngine
+
+        if self.state not in ("ACTIVE", "CREATED"):
+            raise RuntimeError(
+                f"Verification is not permitted while run is {self.state}"
+            )
+
+        if not self.sandbox.is_running or self.sandbox.container is None:
+            raise RuntimeError("Cannot verify: sandbox is not running")
+
+        self.state = "VERIFYING"
+
+        try:
+            self.sandbox.network_manager.isolate_container(
+                self.sandbox.container
+            )
+        except Exception as isolation_err:
+            self.state = "FAILED"
+            try:
+                self.sandbox.stop()
+            except Exception as cleanup_err:
+                self.emitter.emit(
+                    "sandbox.cleanup_failed",
+                    {"error": str(cleanup_err)},
+                )
+            raise RuntimeError(
+                f"Verification aborted because network isolation failed: {isolation_err}"
+            ) from isolation_err
 
         class _Adapter:
             def __init__(self, s: ExecutionService):
@@ -253,18 +307,25 @@ class ExecutionService:
                     cwd=cwd,
                     timeout_s=timeout_s,
                 )
-                res = self.s.run_command(req)
+                res = self.s._run_verification_command(req)
                 return res.exit_code, res.stdout, res.stderr
 
-        engine = VerificationEngine(runner=_Adapter(self), sink=self.emitter)
-        return engine.verify(
-            run_id=self.run_id,
-            entrypoint=entrypoint,
-            http_port=http_port,
-            http_path=http_path,
-            cli_command=cli_command,
-            baseline_test_count=baseline_test_count,
-        )
+        try:
+            engine = VerificationEngine(runner=_Adapter(self), sink=self.emitter)
+            report = engine.verify(
+                run_id=self.run_id,
+                entrypoint=entrypoint,
+                http_port=http_port,
+                http_path=http_path,
+                cli_command=cli_command,
+                baseline_test_count=baseline_test_count,
+            )
+        except Exception:
+            self.state = "FAILED"
+            raise
+
+        self.state = "VERIFIED"
+        return report
 
     def export_workspace(self, target_dir: str) -> str:
         """Export exact /workspace snapshot from container to target directory and return tree hash."""
