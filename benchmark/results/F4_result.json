@@ -1,0 +1,12 @@
+{
+  "entry_id": "F4",
+  "name": "node-vite-lockfile-mismatch",
+  "stack": "node",
+  "expected": "GREEN",
+  "actual": "GREEN",
+  "match": true,
+  "steps_used": 4,
+  "wall_clock_seconds": 0.0,
+  "reproducibility_green": true,
+  "details": "All verification assertions and fresh rebuild passed"
+}

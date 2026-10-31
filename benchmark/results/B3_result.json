@@ -1,0 +1,12 @@
+{
+  "entry_id": "B3",
+  "name": "blocked-private-package",
+  "stack": "node",
+  "expected": "BLOCKED",
+  "actual": "BLOCKED",
+  "match": true,
+  "steps_used": 2,
+  "wall_clock_seconds": 0.0,
+  "reproducibility_green": false,
+  "details": "Run stopped cleanly: required resource '@astroworld/private-core' is unavailable"
+}
