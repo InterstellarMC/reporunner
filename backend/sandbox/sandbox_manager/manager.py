@@ -33,7 +33,7 @@ class SandboxManager:
     def __init__(
         self,
         run_id: str,
-        base_image: str = "python:3.11-slim",
+        base_image: str = "reporunner-python:3.11-git1",
         limits: Optional[RunLimits] = None,
         mount_workspace_volume: bool = True,
         read_only_root: bool = False,

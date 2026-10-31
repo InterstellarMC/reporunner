@@ -35,7 +35,7 @@ class ExecutionService:
         self,
         run_id: str,
         limits: Optional[RunLimits] = None,
-        base_image: str = "python:3.11-slim",
+        base_image: str = "reporunner-python:3.11-git1",
         mount_workspace_volume: bool = True,
         read_only_root: bool = False,
     ):

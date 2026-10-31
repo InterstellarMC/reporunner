@@ -73,22 +73,70 @@ class WorkspaceManager:
         if check_code != 0:
             return False, "Base image does not contain git. Apt-get in restricted container is forbidden."
 
-        # 4. Execute git clone using argument array (no shell interpolation)
-        clone_args = ["git", "clone", repo_url, "/workspace"]
-        exit_code, out, _ = self.sandbox.exec_in_sandbox(clone_args, user="0", timeout_s=180)
-        if exit_code != 0:
-            return False, f"Git clone failed (exit {exit_code}): {out.decode('utf-8', errors='replace')}"
+        # 4. Clone into a temporary directory because /workspace
+        # already contains RepoRunner's internal .shadow_snapshots directory.
+        temp_clone_dir = "/tmp/reporunner-repository-clone"
+        try:
+            cleanup_code, cleanup_out, _ = self.sandbox.exec_in_sandbox(
+                ["rm", "-rf", temp_clone_dir],
+                user="0",
+                timeout_s=10,
+            )
+            clone_args = ["git", "clone", repo_url, temp_clone_dir]
+            exit_code, out, _ = self.sandbox.exec_in_sandbox(
+                clone_args,
+                user="0",
+                timeout_s=180,
+            )
+            if exit_code != 0:
+                return False, (
+                    f"Git clone failed (exit {exit_code}): "
+                    f"{out.decode('utf-8', errors='replace')}"
+                )
 
-        # 5. Check out pinned commit if specified
-        if commit_sha:
-            checkout_args = ["git", "checkout", commit_sha]
-            c_code, c_out, _ = self.sandbox.exec_in_sandbox(checkout_args, workdir="/workspace", timeout_s=30)
-            if c_code != 0:
-                # If commit not in shallow clone, fetch all and retry
-                self.sandbox.exec_in_sandbox(["git", "fetch", "--all"], workdir="/workspace", timeout_s=60)
-                c_code, c_out, _ = self.sandbox.exec_in_sandbox(checkout_args, workdir="/workspace", timeout_s=30)
+            # 5. Check out pinned commit if specified
+            if commit_sha:
+                checkout_args = ["git", "checkout", commit_sha]
+                c_code, c_out, _ = self.sandbox.exec_in_sandbox(
+                    checkout_args,
+                    workdir=temp_clone_dir,
+                    timeout_s=30,
+                )
                 if c_code != 0:
-                    return False, f"Git checkout {commit_sha} failed: {c_out.decode('utf-8', errors='replace')}"
+                    # If commit not in shallow clone, fetch all and retry
+                    self.sandbox.exec_in_sandbox(
+                        ["git", "fetch", "--all"],
+                        workdir=temp_clone_dir,
+                        timeout_s=60,
+                    )
+                    c_code, c_out, _ = self.sandbox.exec_in_sandbox(
+                        checkout_args,
+                        workdir=temp_clone_dir,
+                        timeout_s=30,
+                    )
+                    if c_code != 0:
+                        return False, (
+                            f"Git checkout {commit_sha} failed: "
+                            f"{c_out.decode('utf-8', errors='replace')}"
+                        )
+
+            # 6. Copy complete repository into /workspace (preserving .shadow_snapshots)
+            cp_code, cp_out, _ = self.sandbox.exec_in_sandbox(
+                ["cp", "-a", f"{temp_clone_dir}/.", "/workspace/"],
+                user="0",
+                timeout_s=30,
+            )
+            if cp_code != 0:
+                return False, (
+                    f"Failed to copy repository to /workspace: "
+                    f"{cp_out.decode('utf-8', errors='replace')}"
+                )
+        finally:
+            self.sandbox.exec_in_sandbox(
+                ["rm", "-rf", temp_clone_dir],
+                user="0",
+                timeout_s=10,
+            )
 
         # 6. Verify actual HEAD SHA
         sha_args = ["git", "rev-parse", "HEAD"]

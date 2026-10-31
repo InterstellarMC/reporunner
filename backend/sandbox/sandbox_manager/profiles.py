@@ -14,8 +14,8 @@ DEFAULT_WORKSPACE_DIR = "/workspace"
 APPROVED_MOUNT_TARGETS = {DEFAULT_WORKSPACE_DIR}
 
 # Pinned base images that have git and bootstrap tools installed
-REPORUNNER_BASE_IMAGE_PYTHON = "python:3.11-slim"
-REPORUNNER_BASE_IMAGE_NODE = "node:20-slim"
+REPORUNNER_BASE_IMAGE_PYTHON = "reporunner-python:3.11-git1"
+REPORUNNER_BASE_IMAGE_NODE = "reporunner-node:20-git1"
 
 
 def get_container_host_config(limits: RunLimits, read_only_root: bool = False) -> Dict[str, Any]:

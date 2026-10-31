@@ -156,7 +156,7 @@ def test_build_timeout_produces_failure_and_cleanup(tmp_path):
 
 # 7. Git is available without apt-get.
 def test_git_is_available_without_apt_get():
-    mgr = SandboxManager(run_id="test_git_avail", base_image="python:3.11-slim")
+    mgr = SandboxManager(run_id="test_git_avail", base_image="reporunner-python:3.11-git1")
     try:
         mgr.start()
         # Verify git is directly available without apt-get
@@ -191,7 +191,10 @@ def test_malicious_repository_urls_cannot_execute_shell_commands(bad_url):
 
 # 9. Invalid/unreachable pinned commits fail safely.
 def test_invalid_or_unreachable_pinned_commits_fail_safely():
-    mgr = SandboxManager(run_id="test_bad_sha", base_image="python:3.11-slim")
+    mgr = SandboxManager(
+        run_id="test_bad_sha",
+        base_image="reporunner-python:3.11-git1",
+    )
     try:
         mgr.start()
         wm = WorkspaceManager(sandbox=mgr)
