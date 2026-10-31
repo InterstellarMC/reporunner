@@ -1,0 +1,23 @@
+# Local environment and credentials
+.venv/
+venv/
+.env
+.env.*
+
+# Python and packaging outputs
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Run artifacts and local recipe memory
+/runs/
+*.sqlite
+*.sqlite3
+
+# OS files
+.DS_Store
