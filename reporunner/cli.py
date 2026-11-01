@@ -43,7 +43,10 @@ from rich.status import Status
 from rich.table import Table
 from rich.text import Text
 
-from . import __version__
+try:
+    from . import __version__
+except (ImportError, AttributeError):
+    __version__ = "0.1.0"
 from .config import load_config, save_config, update_config, CONFIG_FILE
 from .api_client import request, stream
 from .events import EventKind, EventStage, RunEvent, VerifyStatus, WorkerStatus, load_events
@@ -325,7 +328,7 @@ def run(
     cfg = load_config()
 
     # ── Collect inputs ────────────────────────────────────────
-    if interactive or not (repo and task):
+    if interactive:
         repo = repo or typer.prompt("Repository (GitHub URL or local path)")
         task = task or typer.prompt("Task description")
         branch = branch or typer.prompt(
