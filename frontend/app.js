@@ -190,6 +190,7 @@ async function select(runId) {
   stopReplay();
   state.replay = null;
   state.selected = runId;
+  $("#run-guidance").value = "";
   state.events = [];
   state.details = null;
   state.patchText = "";
@@ -348,6 +349,17 @@ function renderRun() {
     replay || !["running", "awaiting_approval"].includes(r.status),
   );
   $("#continue-run").classList.toggle("hidden", replay || !["stopped", "failed"].includes(r.status));
+  const canGuide = !replay && m.mode === "live" && r.status === "running";
+  $("#run-guidance").disabled = !canGuide;
+  $("#send-guidance").disabled = !canGuide;
+  $("#guidance-help").textContent = canGuide
+    ? "Ask a question, correct the goal, or tell the agent what to investigate. Guidance is considered after the current operation finishes and answered in the next plan notes. Use Stop to cancel immediately."
+    : paused ? "The run is waiting for your review. Resolve the approval below before sending more guidance."
+    : replay ? "Recorded guidance and plan responses. Replay sends no new messages."
+    : m.mode !== "live" ? "Questions and guidance require Live AI. Local recipes follow existing checks."
+    : "This run has finished. Add your follow-up in the expected behavior box above, then continue a stopped checkpoint or start a new run.";
+  const appliedAt = events.filter(e => e.type === "guidance.applied").at(-1)?.sequence || 0;
+  $("#guidance-messages").innerHTML = events.filter(e => ["user.guidance", "agent.response"].includes(e.type)).slice(-12).map(e => `<p class="guidance-message"><b>${e.type === "user.guidance" ? `You · ${e.sequence < appliedAt ? "received at checkpoint" : "queued"}` : "Agent · plan response"}</b><br>${escape(e.data.message)}</p>`).join("");
   const actionsMetric = $("#run-summary .run-metric strong span");
   if (actionsMetric) actionsMetric.textContent = `/${m.max_steps || 25}`;
   $("#export-replay").classList.toggle("hidden", replay);
@@ -857,6 +869,19 @@ document.addEventListener("click", async (e) => {
     } catch (err) {
       toast(err.message, true);
     }
+  }
+  if (id === "send-guidance" && state.selected) {
+    const input = $("#run-guidance");
+    const message = input.value.trim();
+    if (!message) { input.focus(); return; }
+    $("#send-guidance").disabled = true;
+    try {
+      await api(`/runs/${state.selected}/guidance`, "POST", {message});
+      input.value = "";
+      toast("Guidance queued for the next safe checkpoint.");
+      await poll();
+    } catch (err) { toast(err.message, true); }
+    finally { $("#send-guidance").disabled = state.details?.run.status !== "running"; }
   }
   if (id === "start-benchmark") {
     try {

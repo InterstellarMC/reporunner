@@ -270,6 +270,14 @@
           </div>
           <div id="active-run" class="hidden">
             <div id="run-summary" class="run-summary"></div>
+            <div class="behavior-options" id="guidance-panel">
+              <strong>Guide this run</strong>
+              <p id="guidance-help">Ask a question, correct the goal, or tell the agent what to investigate. Guidance is considered after the current operation finishes. Use Stop to cancel immediately.</p>
+              <div id="guidance-messages" aria-live="polite"></div>
+              <label for="run-guidance">Your question or instruction</label>
+              <textarea id="run-guidance" maxlength="3000" rows="3" placeholder="Example: focus on the login failure. Explain what you found before changing the database configuration. Do not include secrets."></textarea>
+              <button id="send-guidance" class="secondary-button" type="button">Send guidance</button>
+            </div>
             <div
               id="approval-panel"
               class="approval-panel hidden"

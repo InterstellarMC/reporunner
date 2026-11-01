@@ -88,6 +88,15 @@ class Controller:
         self.approvals = {}
         self.active = set()
         self.environment = environment or {}
+        self.guidance = []
+
+    def guide(self, run_id, message):
+        if run_id not in self.active or self.store.view(run_id).status != "running":
+            raise ValueError("Guidance is available while the run is working. Finish the pending review or continue a saved checkpoint first.")
+        if len(self.guidance) >= 10:
+            raise ValueError("Ten messages are already queued; wait for the next checkpoint.")
+        self.guidance.append(message)
+        self.store.emit(run_id, "user.guidance", message=message, status="queued")
 
     def approve(self, run_id: str, answer: HumanApproval):
         pending = self.approvals.get(run_id)
@@ -174,6 +183,16 @@ class Controller:
             candidate_recipe = None
             while True:
                 baseline_round = False
+                if self.guidance:
+                    messages, self.guidance = self.guidance, []
+                    original_goal = self.environment.get("user_goal", "")
+                    history = self.environment.get("user_guidance", [original_goal] if original_goal else []) + messages
+                    self.environment["user_guidance"] = history[-10:]
+                    self.environment["user_goal"] = "\n".join(history)[-12000:]
+                    feedback += "\nUser guidance received at this checkpoint; read environment.user_guidance for the messages."
+                    feedback += "\nAddress questions and explain changes to the user in your decision rationale. Preserve independent verification and original tests."
+                    last_strategy = None
+                    self.store.emit(run_id, "guidance.applied", messages=messages)
                 if hasattr(self.execution, "setup_command"):
                     self.environment["install_argv"] = self.execution.setup_command(run_id)
                 view.rounds += 1
@@ -266,8 +285,13 @@ class Controller:
                                     "patches": [p.model_dump(mode="json") for p in patches]})
                 self.store.emit(run_id, "aggregation.accepted", task_ids=decision.accepted_task_ids,
                                 patch_count=len(patches), commands=[c.model_dump() for c in decision.commands], rationale=decision.rationale)
+                if self.environment.get("user_guidance"):
+                    self.store.emit(run_id, "agent.response", message=decision.rationale)
                 failed = False
                 for index, command in enumerate(decision.commands):
+                    if self.guidance:
+                        failed = True
+                        break
                     charge("sandbox.execute")
                     action = ActionRequest(run_id=run_id, action_id=uuid4().hex, snapshot=context.snapshot,
                         patches=patches if index == 0 else [], commands=[command],
@@ -309,6 +333,8 @@ class Controller:
                         break
                 if failed:
                     continue
+                if self.guidance:
+                    continue
                 if baseline_round and (self.environment.get("user_goal") or self.environment.get("context_policy") == "readme"):
                     feedback = ("Original baseline checks passed. Now review the current source against the supplied user_goal "
                                 "and context_policy. Explain the observed behavior with file evidence. Preserve working code "
@@ -327,6 +353,8 @@ class Controller:
                     feedback = "test failed: independent verification or reproducibility incomplete: " + ", ".join(
                         c.name for c in verified.checks if not c.passed)
                     feedback += "\n" + verified.diagnostic
+                    continue
+                if self.guidance:
                     continue
                 view.grade = "AMBER"
                 await ask("Final senior developer review: inspect approved patches and verification evidence before accepting.", "final")

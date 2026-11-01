@@ -76,6 +76,24 @@ async def test_step_limit_and_cleanup():
     assert c.execution.closed == [result.run_id]
 
 
+async def test_guidance_received_during_execution_reaches_next_plan():
+    class GuidedExecution(DemoExecution):
+        async def execute(self, request):
+            result = await super().execute(request)
+            if self.calls == 1:
+                controller.guide(request.run_id, "Explain the missing dependency before proposing the fix")
+            return result
+    execution = GuidedExecution(demo_context())
+    controller = setup(execution=execution)
+    result = await complete(controller)
+    assert result.status == "completed"
+    assert controller.environment["user_guidance"] == ["Explain the missing dependency before proposing the fix"]
+    types = [e.type for e in controller.store.events(result.run_id)]
+    assert types.index("user.guidance") < types.index("guidance.applied") < types.index("agent.response")
+    with pytest.raises(ValueError):
+        controller.guide(result.run_id, "Too late")
+
+
 async def test_insufficient_parallel_worker_budget_stops_cleanly():
     c = setup(max_steps=2)
     view = await c.run(demo_context())

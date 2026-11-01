@@ -1419,6 +1419,9 @@ h2 {
 .behavior-options textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 5px; font: inherit; resize: vertical; }
 
 .specialist-explanation { grid-column: 1 / -1; margin: 0; font-size: 13px; line-height: 1.6; }
+.guidance-message { padding: 10px; border-left: 2px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+#guidance-messages { max-height: 280px; overflow-y: auto; }
+#guidance-panel button { margin-top: 10px; }
 .worker-purpose { font-size: 13px; line-height: 1.5; margin: 12px 0 6px; }
 .worker-engine { font-size: 11px; overflow-wrap: anywhere; opacity: .8; }
 .worker-details { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; font-size: 12px; }

@@ -55,6 +55,10 @@ class Resource(Wire):
     value: str = Field(repr=False)
 
 
+class Guidance(Wire):
+    message: str = Field(min_length=1, max_length=3000)
+
+
 def now():
     return datetime.now(timezone.utc).isoformat()
 
@@ -315,6 +319,20 @@ def create_application(data: Path | None = None):
     async def events(run_id: str, after: int = 0):
         details(run_id)
         return service.store.events(run_id, max(0, after))
+
+    @api.post("/runs/{run_id}/guidance", status_code=202)
+    async def guidance(run_id: str, body: Guidance):
+        run = details(run_id)
+        if run["metadata"].get("mode") != "live":
+            raise HTTPException(409, "Conversation guidance requires Live AI; local recipes use existing checks.")
+        controller = service.controllers.get(run_id)
+        if not controller or not body.message.strip():
+            raise HTTPException(409, "Start or continue a Live AI run before sending guidance.")
+        try:
+            controller.guide(run_id, body.message.strip())
+        except ValueError as exc:
+            raise HTTPException(409, str(exc))
+        return {"accepted": True, "status": "queued", "message": "Guidance will be considered at the next safe checkpoint."}
 
     @api.get("/runs/{run_id}/replay")
     async def replay(run_id: str):
