@@ -405,6 +405,9 @@ function renderRun() {
   $("#supervisor-state").classList.toggle("active", running);
   if (plan) {
     const since = events.filter((e) => e.sequence > plan.sequence);
+    const expandedAssignments = new Set(
+      $$("#workers .worker-details[open]").map(el => el.dataset.assignment),
+    );
     const purposes = {
       repository: "Understand source structure and behavior",
       environment: "Check runtime and environment requirements",
@@ -427,7 +430,8 @@ function renderRun() {
         const failed = since.some(e => e.type === "model.failed" && e.data.role === t.specialist);
         const status = done ? done.data.status === "blocked" ? "Blocked" : "Complete" : failed ? "Failed" : started ? "Working" : "Queued";
         const engine = m.mode === "local" || provider === "LocalProvider" ? "Local recipe engine · no LLM call" : model ? `Model: ${provider || "Recorded model"}` : running ? "Awaiting model dispatch" : "No model dispatch recorded";
-        return `<div class="worker"><div class="worker-top"><span class="worker-role">${t.specialist === "environment" ? "⌘" : t.specialist === "dependency" ? "⊞" : "⌁"}</span><strong>${escape(t.specialist.charAt(0).toUpperCase() + t.specialist.slice(1))}</strong><span class="worker-status ${started && !done && !failed ? "active" : ""}">${status}</span></div><div class="worker-purpose">${escape(purposes[t.specialist] || "Analyze the assigned task")}</div><div class="worker-engine">${escape(engine)}</div><p title="${escape(t.objective)}">${escape(done ? Object.values(done.data.findings || {}).join(" · ") || "Structured findings returned" : t.objective.split("\n")[0])}</p><div class="worker-scope">${escape(t.scope.slice(0, 3).join(" · "))}${t.scope.length > 3 ? ` +${t.scope.length - 3}` : ""}</div><details class="worker-details"><summary>View assignment and evidence</summary><p><b>Task:</b> ${escape(t.objective)}</p><p><b>Files:</b> ${escape(t.scope.join(", "))}</p><p><b>Acceptance:</b> ${escape((t.acceptance_criteria || []).join("; "))}</p>${done ? `<p><b>Evidence:</b> ${escape((done.data.evidence || []).join("; ") || "No evidence references returned")}</p><p><b>Open questions:</b> ${escape((done.data.unresolved_questions || []).join("; ") || "None reported")}</p>` : ""}</details></div>`;
+        const assignmentKey = `${r.run_id}:${plan.sequence}:${t.task_id}`;
+        return `<div class="worker"><div class="worker-top"><span class="worker-role">${t.specialist === "environment" ? "⌘" : t.specialist === "dependency" ? "⊞" : "⌁"}</span><strong>${escape(t.specialist.charAt(0).toUpperCase() + t.specialist.slice(1))}</strong><span class="worker-status ${started && !done && !failed ? "active" : ""}">${status}</span></div><div class="worker-purpose">${escape(purposes[t.specialist] || "Analyze the assigned task")}</div><div class="worker-engine">${escape(engine)}</div><p title="${escape(t.objective)}">${escape(done ? Object.values(done.data.findings || {}).join(" · ") || "Structured findings returned" : t.objective.split("\n")[0])}</p><div class="worker-scope">${escape(t.scope.slice(0, 3).join(" · "))}${t.scope.length > 3 ? ` +${t.scope.length - 3}` : ""}</div><details class="worker-details" data-assignment="${escape(assignmentKey)}" ${expandedAssignments.has(assignmentKey) ? "open" : ""}><summary>View assignment and evidence</summary><p><b>Task:</b> ${escape(t.objective)}</p><p><b>Files:</b> ${escape(t.scope.join(", "))}</p><p><b>Acceptance:</b> ${escape((t.acceptance_criteria || []).join("; "))}</p>${done ? `<p><b>Evidence:</b> ${escape((done.data.evidence || []).join("; ") || "No evidence references returned")}</p><p><b>Open questions:</b> ${escape((done.data.unresolved_questions || []).join("; ") || "None reported")}</p>` : ""}</details></div>`;
       })
       .join("");
   } else {
