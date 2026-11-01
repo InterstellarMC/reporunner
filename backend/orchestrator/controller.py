@@ -3,6 +3,7 @@ import hashlib
 import re
 import time
 import httpx
+import json
 from collections import Counter
 from uuid import uuid4
 from .aggregation import conflicts, validate_result
@@ -12,6 +13,7 @@ from .models import (ActionRequest, Command, Decision, Decomposition, HumanAppro
 from .store import Store
 from .providers import LAST_USAGE
 from ..sandbox.patches import PatchRejected
+from ..evidence.generator import scrub
 
 
 class StopRun(Exception):
@@ -146,7 +148,12 @@ class Controller:
         async def generate(provider, instruction, payload, output, role):
             started = time.monotonic()
             LAST_USAGE.set({})
-            self.store.emit(run_id, "model.started", role=role, provider=getattr(provider, "model", getattr(provider, "name", type(provider).__name__)))
+            provider_name = getattr(provider, "model", getattr(provider, "name", type(provider).__name__))
+            prompt = json.dumps({"instruction": instruction, "payload": payload}, ensure_ascii=False, default=str)
+            safe_prompt = scrub(prompt)
+            self.store.emit(run_id, "model.prompt", role=role, provider=provider_name,
+                            preview=safe_prompt[:24000], characters=len(safe_prompt), truncated=len(safe_prompt) > 24000)
+            self.store.emit(run_id, "model.started", role=role, provider=provider_name)
             try:
                 result = await provider.generate(instruction, payload, output)
             except Exception as exc:

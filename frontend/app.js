@@ -450,6 +450,17 @@ function renderRun() {
     $("#workers").innerHTML =
       `<div class="worker-placeholder">${r.status === "completed" && events.some(e => e.type === "baseline.started") ? "No specialists were dispatched. The original checks already passed, so RepoRunner verified and rebuilt the candidate without model analysis or source repairs." : events.some((e) => e.type === "baseline.started") ? "Running original checks first. Specialists are assigned when a failure or requested behavior review needs investigation." : "Assigned specialists will appear here when the supervisor creates a plan."}</div>`;
   }
+  const prompts = events.filter(e => e.type === "model.prompt");
+  const taskList = events.filter(e => e.type === "plan.created").flatMap(e => e.data.tasks || []);
+  const activity = taskList.map(t => {
+    const ev = events.filter(e => e.data.task_id === t.task_id || e.data.task?.task_id === t.task_id || e.data.role === t.specialist);
+    const done = ev.find(e => e.type === "worker.completed");
+    const failed = ev.some(e => e.type === "model.failed");
+    const active = ev.some(e => e.type === "model.started");
+    const text = done ? `Finished; ${done.data.patch_count || 0} patch proposals.` : failed ? "Model call failed; inspect timeline." : active ? `Analyzing assigned files: ${t.scope.join(", ")}.` : "Assigned; waiting for model dispatch.";
+    return `<p><b>${escape(t.specialist)} · ${escape(t.task_id)}</b><br>${escape(text)}</p>`;
+  }).join("");
+  $("#backroom-content").innerHTML = `${activity || "No specialist tasks assigned yet."}<h4>Actual prompts sent (${prompts.length})</h4>${prompts.slice().reverse().map(e => `<details><summary>${escape(e.data.role)} · ${escape(e.data.provider)} · ${e.data.characters} characters${e.data.truncated ? " · truncated" : ""}</summary><pre>${escape(e.data.preview)}</pre></details>`).join("")}`;
   const stages = [
     ["Plan", events.some((e) => ["plan.created", "baseline.started"].includes(e.type))],
     ["Specialists", events.some((e) => e.type === "worker.completed")],

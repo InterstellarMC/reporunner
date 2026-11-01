@@ -1419,6 +1419,9 @@ h2 {
 .behavior-options textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 5px; font: inherit; resize: vertical; }
 
 .specialist-explanation { grid-column: 1 / -1; margin: 0; font-size: 13px; line-height: 1.6; }
+.backroom { margin: 12px 20px; padding: 14px; border: 1px solid var(--line); }
+.backroom summary { cursor: pointer; font-weight: 600; }
+.backroom pre { max-height: 420px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: var(--terminal); color: var(--terminal-text); font: 11px/1.5 var(--mono); }
 .guidance-message { padding: 10px; border-left: 2px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
 #guidance-messages { max-height: 280px; overflow-y: auto; }
 #guidance-panel button { margin-top: 10px; }
