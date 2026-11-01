@@ -405,7 +405,15 @@ function renderRun() {
   $("#supervisor-state").classList.toggle("active", running);
   if (plan) {
     const since = events.filter((e) => e.sequence > plan.sequence);
-    $("#workers").innerHTML = plan.data.tasks
+    const purposes = {
+      repository: "Understand source structure and behavior",
+      environment: "Check runtime and environment requirements",
+      dependency: "Investigate missing or incompatible packages",
+      configuration: "Inspect project settings and configuration",
+      build: "Investigate build failures and propose source repairs",
+      test: "Examine failures and preserve the original test contract",
+    };
+    $("#workers").innerHTML = `<p class="specialist-explanation">Assigned this round: ${escape([...new Set(plan.data.tasks.map(t => t.specialist))].join(", "))}. Each specialist analyzes its assigned files and returns proposals; the supervisor selects the plan for sandbox execution.</p>` + plan.data.tasks
       .map((t) => {
         const done = since.find(
           (e) => e.type === "worker.completed" && e.data.task_id === t.task_id,
@@ -414,12 +422,17 @@ function renderRun() {
           (e) =>
             e.type === "worker.started" && e.data.task?.task_id === t.task_id,
         );
-        return `<div class="worker"><div class="worker-top"><span class="worker-role">${t.specialist === "environment" ? "⌘" : t.specialist === "dependency" ? "⊞" : "⌁"}</span><strong>${escape(t.specialist.charAt(0).toUpperCase() + t.specialist.slice(1))}</strong><span class="worker-status ${started && !done ? "active" : ""}">${done ? "Complete" : started ? "Working" : "Queued"}</span></div><p title="${escape(t.objective)}">${escape(done ? Object.values(done.data.findings || {}).join(" · ") || "Structured findings returned" : t.objective.split("\n")[0])}</p><div class="worker-scope">${escape(t.scope.slice(0, 3).join(" · "))}${t.scope.length > 3 ? ` +${t.scope.length - 3}` : ""}</div></div>`;
+        const model = since.find(e => e.type === "model.started" && e.data.role === t.specialist);
+        const provider = since.find(e => e.type === "model.completed" && e.data.role === t.specialist)?.data.provider || model?.data.provider;
+        const failed = since.some(e => e.type === "model.failed" && e.data.role === t.specialist);
+        const status = done ? done.data.status === "blocked" ? "Blocked" : "Complete" : failed ? "Failed" : started ? "Working" : "Queued";
+        const engine = m.mode === "local" || provider === "LocalProvider" ? "Local recipe engine · no LLM call" : model ? `Model: ${provider || "Recorded model"}` : running ? "Awaiting model dispatch" : "No model dispatch recorded";
+        return `<div class="worker"><div class="worker-top"><span class="worker-role">${t.specialist === "environment" ? "⌘" : t.specialist === "dependency" ? "⊞" : "⌁"}</span><strong>${escape(t.specialist.charAt(0).toUpperCase() + t.specialist.slice(1))}</strong><span class="worker-status ${started && !done && !failed ? "active" : ""}">${status}</span></div><div class="worker-purpose">${escape(purposes[t.specialist] || "Analyze the assigned task")}</div><div class="worker-engine">${escape(engine)}</div><p title="${escape(t.objective)}">${escape(done ? Object.values(done.data.findings || {}).join(" · ") || "Structured findings returned" : t.objective.split("\n")[0])}</p><div class="worker-scope">${escape(t.scope.slice(0, 3).join(" · "))}${t.scope.length > 3 ? ` +${t.scope.length - 3}` : ""}</div><details class="worker-details"><summary>View assignment and evidence</summary><p><b>Task:</b> ${escape(t.objective)}</p><p><b>Files:</b> ${escape(t.scope.join(", "))}</p><p><b>Acceptance:</b> ${escape((t.acceptance_criteria || []).join("; "))}</p>${done ? `<p><b>Evidence:</b> ${escape((done.data.evidence || []).join("; ") || "No evidence references returned")}</p><p><b>Open questions:</b> ${escape((done.data.unresolved_questions || []).join("; ") || "None reported")}</p>` : ""}</details></div>`;
       })
       .join("");
   } else {
     $("#workers").innerHTML =
-      `<div class="worker-placeholder">${events.some((e) => e.type === "baseline.started") ? "Original tests run before specialists propose repairs. A passing baseline needs verification; a failing baseline is sent to the repair agents." : "Scoped specialists appear here when the plan is ready."}</div>`;
+      `<div class="worker-placeholder">${r.status === "completed" && events.some(e => e.type === "baseline.started") ? "No specialists were dispatched. The original checks already passed, so RepoRunner verified and rebuilt the candidate without model analysis or source repairs." : events.some((e) => e.type === "baseline.started") ? "Running original checks first. Specialists are assigned when a failure or requested behavior review needs investigation." : "Assigned specialists will appear here when the supervisor creates a plan."}</div>`;
   }
   const stages = [
     ["Plan", events.some((e) => ["plan.created", "baseline.started"].includes(e.type))],

@@ -1417,6 +1417,13 @@ h2 {
 .behavior-options legend { font-size: 13px; margin-bottom: 10px; }
 .behavior-options label { display: block; font-size: 13px; margin: 10px 0; }
 .behavior-options textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 5px; font: inherit; resize: vertical; }
+
+.specialist-explanation { grid-column: 1 / -1; margin: 0; font-size: 13px; line-height: 1.6; }
+.worker-purpose { font-size: 13px; line-height: 1.5; margin: 12px 0 6px; }
+.worker-engine { font-size: 11px; overflow-wrap: anywhere; opacity: .8; }
+.worker-details { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; font-size: 12px; }
+.worker-details summary { cursor: pointer; }
+.worker .worker-details p { display: block; max-height: none; overflow: visible; white-space: normal; -webkit-line-clamp: unset; overflow-wrap: anywhere; font-size: 12px; line-height: 1.6; }
 .replay-controls > input {
   flex: 1;
   accent-color: var(--blue);
