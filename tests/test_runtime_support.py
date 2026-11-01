@@ -99,6 +99,35 @@ async def test_passing_baseline_never_calls_a_model():
     assert not any(e.type=='model.completed' for e in controller.store.events(result.run_id))
 
 
+async def test_optional_goal_reviews_only_after_original_baseline():
+    import asyncio
+    from backend.orchestrator.demo import DemoExecution, DemoProvider, demo_context, approve_all
+    from backend.orchestrator.controller import Controller
+    from backend.orchestrator.providers import Router
+    from backend.orchestrator.models import Specialist, Decomposition, WorkerResult
+    ctx = demo_context()
+    ctx.files['requirements.txt'] = 'requests\n'
+    execution = DemoExecution(ctx)
+    class ReviewProvider(DemoProvider):
+        async def generate(self, instruction, payload, output):
+            assert execution.calls >= 1, 'Baseline must execute before behavior review'
+            assert payload['environment']['user_goal'] == 'Describe pagination behavior'
+            result = await super().generate(instruction, payload, output)
+            if output is WorkerResult:
+                result.patches = []
+            return result
+    provider = ReviewProvider()
+    controller = Controller(Router(provider, {s: provider for s in Specialist}), execution, Store(':memory:'),
+        environment={'test_argv': ['python', '-m', 'pytest'], 'context_policy': 'readme', 'user_goal': 'Describe pagination behavior'})
+    task = asyncio.create_task(controller.run(ctx))
+    await approve_all(controller, task)
+    result = await task
+    assert result.status == 'completed'
+    events = controller.store.events(result.run_id)
+    assert any(e.type == 'baseline.review' for e in events)
+    assert any(e.type == 'model.completed' for e in events)
+
+
 def test_report_preserves_failed_attempts(tmp_path):
     from backend.sandbox.execution import LocalExecution
     from backend.orchestrator.models import RunView

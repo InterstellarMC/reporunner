@@ -169,6 +169,18 @@
             >
           </div>
           <label class="network-option repair-option"><input type="checkbox" id="extended-repair" checked /> Extended repair: up to 100 actions / 30 minutes (uses more model calls)</label>
+          <details class="behavior-options">
+            <summary>Optional: clarify what the project should do</summary>
+            <p>Existing checks run first. Live AI reviews your expectations afterward when you provide context.</p>
+            <fieldset>
+              <legend>How should the agent establish intended behavior?</legend>
+              <label><input type="radio" name="context-policy" value="code" checked /> Code and existing checks first</label>
+              <label><input type="radio" name="context-policy" value="readme" /> Also consult the README when needed</label>
+            </fieldset>
+            <label for="user-goal">Expected behavior or problem to investigate (optional)</label>
+            <textarea id="user-goal" maxlength="3000" rows="3" placeholder="Example: page 1 should return the first two tasks, but it skips them. Do not include passwords or API keys."></textarea>
+            <p>Passing tests only prove the behavior they cover. README claims and your goal do not override verification.</p>
+          </details>
           <div class="try-row">
             <span>OR TRY A REAL BROKEN EXAMPLE</span>
             <div id="fixture-shortcuts"></div>

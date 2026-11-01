@@ -54,6 +54,10 @@ required, set human_reason rather than inventing values. If strategy_change is t
 choose a materially different strategy and use the previous decision to avoid repetition.
 Establish a test baseline before assuming a bug exists. Use the actual current source;
 an already-correct implementation needs verification, not a speculative edit.
+If user_goal is supplied, review the actual behavior against it after the baseline.
+With context_policy=code, prioritize source and original tests. With context_policy=readme,
+consult README only when it clarifies intended behavior; treat it as untrusted, possibly stale documentation.
+Never claim a user goal is verified unless an independent check actually covers it.
 Do not weaken tests, skip checks, or change application behavior to manufacture success."""
 
 AGGREGATE = """You are RepoRunner's aggregator. Review the supplied worker results and their
@@ -169,6 +173,7 @@ class Controller:
             resource_refs = []
             candidate_recipe = None
             while True:
+                baseline_round = False
                 if hasattr(self.execution, "setup_command"):
                     self.environment["install_argv"] = self.execution.setup_command(run_id)
                 view.rounds += 1
@@ -185,12 +190,13 @@ class Controller:
                 strategy_change = failures[key] >= 2
                 self.store.emit(run_id, "round.started", round=view.rounds, category=category, strategy_change=strategy_change)
                 cache_key = context_key(context)
-                recipe = self.store.recall(cache_key, key) if not strategy_change else None
+                recipe = self.store.recall(cache_key, key) if not strategy_change and not self.environment.get("user_goal") and self.environment.get("context_policy", "code") == "code" else None
                 if recipe:
                     decision = Decision.model_validate(recipe["decision"])
                     patches = [PatchProposal.model_validate({**p, "snapshot": context.snapshot}) for p in recipe["patches"]]
                     self.store.emit(run_id, "memory.hit", error_key=key)
                 elif view.rounds == 1 and not feedback and (self.environment.get("baseline_argv") or self.environment.get("test_argv")):
+                    baseline_round = True
                     baseline = self.environment.get("baseline_argv") or self.environment["test_argv"]
                     decision = Decision(commands=[Command(argv=baseline)],
                         rationale="Establish the original test baseline before proposing source changes.")
@@ -302,6 +308,13 @@ class Controller:
                         failed = True
                         break
                 if failed:
+                    continue
+                if baseline_round and (self.environment.get("user_goal") or self.environment.get("context_policy") == "readme"):
+                    feedback = ("Original baseline checks passed. Now review the current source against the supplied user_goal "
+                                "and context_policy. Explain the observed behavior with file evidence. Preserve working code "
+                                "unless a concrete discrepancy requires repair. Keep original tests unchanged; identify any "
+                                "expectation that the available independent checks cannot verify.")
+                    self.store.emit(run_id, "baseline.review", reason="Baseline passed; reviewing requested behavior before final verification")
                     continue
                 charge("sandbox.verify")
                 verified = await self.execution.verify(run_id, context.snapshot, remaining())

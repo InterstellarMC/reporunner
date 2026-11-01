@@ -34,6 +34,8 @@ class Submission(Wire):
     fixture: str | None = None
     mode: str = Field(default="local", pattern="^(local|live)$")
     network: bool = False
+    context_policy: str = Field(default="code", pattern="^(code|readme)$")
+    user_goal: str = Field(default="", max_length=3000)
     resume_from: str | None = Field(default=None, pattern="^[a-f0-9]{32}$")
     max_steps: int = Field(default=25, ge=10, le=250)
     max_seconds: int = Field(default=600, ge=60, le=3600)
@@ -92,6 +94,8 @@ class Application:
         return {"run": view.model_dump(mode="json"), "metadata": self.record(run_id), "artifacts": artifacts}
 
     def launch(self, submission: Submission, evaluation=False):
+        if submission.mode != "live" and (submission.user_goal.strip() or submission.context_policy == "readme"):
+            raise HTTPException(422, "Custom behavior review and README context require Live AI. Local recipes use existing checks.")
         if len(self.jobs) >= 3:
             raise HTTPException(429, "Three runs are already active. Stop one or wait for completion.")
         if submission.mode == "live" and not self.live_router:
@@ -140,6 +144,7 @@ class Application:
                         break
                     inventory.append(name)
                 environment = {"stack": context.stack, "test_argv": workspace.test_argv,
+                    "context_policy": submission.context_policy, "user_goal": submission.user_goal.strip(),
                     "baseline_argv": ["npm", "test"] if "test" in package.get("scripts", {}) else workspace.test_argv,
                     "server_argv": server_command(workspace.path, context.stack),
                     "repository_files": inventory,

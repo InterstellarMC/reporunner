@@ -249,6 +249,8 @@ async function launch(fixture = null) {
     const result = await api("/runs", "POST", {
       fixture,
       repository_url: url,
+      context_policy: $('input[name="context-policy"]:checked').value,
+      user_goal: $("#user-goal").value.trim(),
       mode: state.mode,
       network: $("#network-access").checked,
       max_steps: $("#extended-repair").checked ? 100 : 25,
@@ -811,6 +813,8 @@ document.addEventListener("click", async (e) => {
     state.busy = true;
     try {
       const result = await api("/runs", "POST", {resume_from: state.selected, mode: state.details?.metadata.mode || state.mode,
+        context_policy: $('input[name="context-policy"]:checked').value,
+        user_goal: $("#user-goal").value.trim(),
         network: $("#network-access").checked, max_steps: $("#extended-repair").checked ? 100 : 25,
         max_seconds: $("#extended-repair").checked ? 1800 : 600});
       await select(result.run_id);
