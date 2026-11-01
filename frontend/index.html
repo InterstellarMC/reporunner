@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="RepoRunner — repair repositories in a sandbox, verify the result, keep the proof."
+    />
+    <title>RepoRunner — Make it run. Prove it works.</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232d4cf5'/%3E%3Cpath d='M10 8h7a5 5 0 0 1 0 10h-7m5 0 7 7M10 8v17' fill='none' stroke='white' stroke-width='3'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script type="module" src="/assets/app.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="RepoRunner home"
+        ><span class="brand-symbol">R<span>↗</span></span
+        ><span
+          >repo<span class="brand-light">runner</span
+          ><small>BUILT BY ASTROWORLD</small></span
+        ></a
+      >
+      <div class="workspace-label">
+        <span class="tiny-grid">⌘</span> Mission control
+        <span class="keyhint">LOCAL</span>
+      </div>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-nav="runs">
+          <span>◈</span> Repository runs
+          <span id="run-count" class="nav-count">0</span>
+        </button>
+        <button class="nav-item" data-nav="benchmark">
+          <span>▥</span> Benchmarks
+        </button>
+        <button class="nav-item" data-nav="replay">
+          <span>↺</span> Replay a run
+        </button>
+      </nav>
+      <div class="history-heading">
+        <span>RECENT RUNS</span
+        ><button
+          id="refresh-history"
+          aria-label="Refresh run history"
+          title="Refresh history"
+        >
+          ↻
+        </button>
+      </div>
+      <div id="history" class="history-list">
+        <p class="sidebar-empty">Your first run starts here.</p>
+      </div>
+      <div class="sidebar-bottom">
+        <button id="settings-button" class="settings-button">
+          <span>⚙</span> Model settings <span>↗</span>
+        </button>
+        <div class="team">
+          <span class="team-avatar">A</span>
+          <div>Astroworld<small>Agentathon 2026</small></div>
+          <span class="local-dot"></span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="breadcrumb">
+          Workspace <span>/</span>
+          <strong id="page-name">Repository runs</strong>
+        </div>
+        <div class="topbar-right">
+          <span id="docker-status" class="system-status"
+            ><i></i> Checking Docker</span
+          ><button
+            class="mobile-nav-button"
+            data-nav="runs"
+            aria-label="Repository runs"
+          >
+            ◈</button
+          ><button
+            class="mobile-nav-button"
+            data-nav="benchmark"
+            aria-label="Benchmarks"
+          >
+            ▥</button
+          ><button
+            class="mobile-nav-button"
+            data-nav="replay"
+            aria-label="Replay a run"
+          >
+            ↺</button
+          ><button
+            id="top-model-settings"
+            class="top-settings"
+            aria-label="Model settings"
+            title="Model settings"
+          >
+            ⚙</button
+          ><span class="version">v1.0</span>
+        </div>
+      </header>
+      <main>
+        <section class="hero">
+          <div>
+            <div class="eyebrow">
+              <span class="blue-line"></span> FROM BROKEN REPO TO AUDITABLE
+              PROOF
+            </div>
+            <h1>Make it <em>run.</em><br />Prove it works.</h1>
+            <p>
+              One repository. A team of specialists.<br />Every fix tested.
+              Every result backed by evidence.
+            </p>
+          </div>
+          <div class="hero-note">
+            <span class="note-star">✳</span>
+            <p>
+              The model proposes.<br /><strong>The sandbox decides.</strong>
+            </p>
+            <span class="note-rule"></span
+            ><small>CONFIGURABLE BUDGETS · CHECKPOINTS · VERIFIED EVIDENCE</small>
+          </div>
+        </section>
+
+        <section
+          id="launcher"
+          class="launcher"
+          aria-label="Launch repository run"
+        >
+          <div class="launch-top">
+            <div>
+              <span class="section-index">01</span>
+              <h2>Give it a repository</h2>
+            </div>
+            <div class="mode-switch" role="group" aria-label="Repair engine">
+              <button id="mode-local" class="selected" data-mode="local">
+                Local recipes</button
+              ><button id="mode-live" data-mode="live">
+                Live AI <span id="live-config-dot">○</span>
+              </button>
+            </div>
+          </div>
+          <form id="launch-form">
+            <div class="repo-input-wrap">
+              <span class="repo-git-icon">⌘</span
+              ><label class="sr-only" for="repo-url"
+                >Public GitHub repository URL</label
+              ><input
+                id="repo-url"
+                type="url"
+                placeholder="https://github.com/your-team/that-broken-repo"
+                autocomplete="off"
+                spellcheck="false"
+              /><button id="run-button" type="submit">
+                Run repository <span>↗</span>
+              </button>
+            </div>
+          </form>
+          <div class="launch-bottom">
+            <span id="engine-description"
+              ><span class="small-dot blue"></span> Deterministic repair recipes
+              · no API key needed · real Docker execution</span
+            ><label class="network-option"
+              ><input type="checkbox" id="network-access" /> Package network
+              access</label
+            >
+          </div>
+          <label class="network-option repair-option"><input type="checkbox" id="extended-repair" checked /> Extended repair: up to 100 actions / 30 minutes (uses more model calls)</label>
+          <div class="try-row">
+            <span>OR TRY A REAL BROKEN EXAMPLE</span>
+            <div id="fixture-shortcuts"></div>
+            <button id="all-examples" class="text-button">
+              All examples ↗
+            </button>
+          </div>
+        </section>
+
+        <section id="examples-panel" class="examples-panel hidden">
+          <div class="panel-heading">
+            <h2>Small repositories. Real failures.</h2>
+            <button
+              id="close-examples"
+              class="icon-button"
+              aria-label="Close examples"
+            >
+              ×
+            </button>
+          </div>
+          <p>
+            Seven repairable examples and three resource blockers. Curated local
+            repositories, executed in Docker.
+          </p>
+          <div id="examples-grid" class="examples-grid"></div>
+        </section>
+
+        <section id="run-section" class="run-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-index">02</span>
+              <h2 id="run-title">The work, in the open</h2>
+              <span id="run-source" class="source-label"
+                >LIVE OBSERVABILITY</span
+              >
+            </div>
+            <div class="run-actions">
+              <button id="cancel-run" class="secondary-button hidden">
+                Stop run</button
+              ><button id="continue-run" class="secondary-button hidden">Continue from checkpoint</button
+              ><a id="download-report" class="secondary-button hidden" href="#">↓ Run report</a
+              ><button id="export-replay" class="secondary-button hidden">
+                ↓ Replay</button
+              ><a id="download-bundle" class="secondary-button hidden" href="#"
+                >↓ Evidence bundle</a
+              >
+            </div>
+          </div>
+          <div id="empty-state" class="empty-state">
+            <div class="empty-topline">
+              <span class="small-dot"></span> READY WHEN YOU ARE<span
+                >EVERY CHECK LEAVES A TRACE</span
+              >
+            </div>
+            <div class="pipeline-overview">
+              <div>
+                <span class="pipeline-number">01</span
+                ><strong>Understand</strong
+                ><small
+                  >Read the repository.<br />Break the problem down.</small
+                >
+              </div>
+              <span class="pipeline-arrow">→</span>
+              <div>
+                <span class="pipeline-number">02</span><strong>Repair</strong
+                ><small
+                  >Specialists propose.<br />Conflicts get resolved.</small
+                >
+              </div>
+              <span class="pipeline-arrow">→</span>
+              <div>
+                <span class="pipeline-number">03</span><strong>Execute</strong
+                ><small>Run in isolation.<br />Learn from real errors.</small>
+              </div>
+              <span class="pipeline-arrow">→</span>
+              <div>
+                <span class="pipeline-number">04</span><strong>Prove</strong
+                ><small
+                  >Independent tests.<br />A completely fresh build.</small
+                >
+              </div>
+            </div>
+            <div class="empty-caption">
+              A successful command is a start. Reproducible evidence is the
+              finish line.
+            </div>
+          </div>
+          <div id="active-run" class="hidden">
+            <div id="run-summary" class="run-summary"></div>
+            <div
+              id="approval-panel"
+              class="approval-panel hidden"
+              aria-live="polite"
+            ></div>
+            <div class="orchestration-panel">
+              <div class="orchestration-heading">
+                <span class="mono-label">THE SPECIALIST FLOOR</span
+                ><span id="round-indicator">ROUND 01</span>
+              </div>
+              <div class="supervisor-row">
+                <span class="supervisor-icon">✳</span>
+                <div>
+                  <strong id="supervisor-name">Supervisor</strong
+                  ><span id="supervisor-description"
+                    >Decompose → delegate → reconcile</span
+                  >
+                </div>
+                <span id="supervisor-state" class="worker-status">Waiting</span>
+              </div>
+              <div id="workers" class="workers">
+                <div class="worker-placeholder">
+                  Scoped specialists appear here when the plan is ready.
+                </div>
+              </div>
+              <div id="pipeline-status" class="pipeline-status"></div>
+            </div>
+            <div class="workspace-tabs" role="tablist" aria-label="Run details">
+              <button class="selected" data-tab="logs" role="tab">
+                Execution log <span id="log-count">0</span></button
+              ><button data-tab="timeline" role="tab">Timeline</button
+              ><button data-tab="diff" role="tab">
+                Changes <span id="patch-count">0</span></button
+              ><button data-tab="evidence" role="tab">
+                Evidence <span id="evidence-count">0</span>
+              </button>
+            </div>
+            <div id="tab-content" class="tab-content"></div>
+          </div>
+        </section>
+
+        <section id="benchmark-section" class="benchmark-section hidden">
+          <div class="section-heading">
+            <div>
+              <span class="section-index">03</span>
+              <h2>Results you can question</h2>
+            </div>
+            <button id="start-benchmark" class="primary-button">
+              Run 10-repository evaluation ↗
+            </button>
+          </div>
+          <p class="section-description">
+            A real local benchmark: seven fixable repositories, three deliberate
+            blockers. Every row links to its complete execution trace. This is
+            not a public GitHub benchmark.
+          </p>
+          <div class="evaluation-note">
+            Evaluation policy: verified fixture results are accepted
+            automatically; resource blockers are declined. This does not
+            represent a senior developer's human review.
+          </div>
+          <div id="benchmark-results" class="benchmark-results">
+            <div class="blank-panel">
+              No evaluation results yet. Run the suite to measure actual
+              outcomes.
+            </div>
+          </div>
+        </section>
+
+        <section id="replay-section" class="replay-section hidden">
+          <div class="section-heading">
+            <div>
+              <span class="section-index">↺</span>
+              <h2>Rewind the evidence</h2>
+            </div>
+          </div>
+          <div class="replay-drop">
+            <span class="replay-symbol">↺</span>
+            <h3>Every run tells a story. Play it back.</h3>
+            <p>
+              Import an exported timeline to replay the plan, failures, repairs,
+              and verification.<br />No models called. No commands executed.
+            </p>
+            <label class="primary-button" for="replay-file"
+              >Choose a timeline.jsonl file ↗</label
+            ><input
+              id="replay-file"
+              type="file"
+              accept=".jsonl,.ndjson,.json"
+              class="sr-only"
+            />
+          </div>
+          <div id="replay-controls" class="replay-controls hidden">
+            <button id="replay-play" class="primary-button">▶ Play</button
+            ><input
+              id="replay-slider"
+              type="range"
+              min="0"
+              max="1"
+              value="0"
+              aria-label="Replay position"
+            /><span id="replay-position">0 / 0</span
+            ><select id="replay-speed" aria-label="Replay speed">
+              <option value="500">1×</option>
+              <option value="200">2×</option>
+              <option value="80">5×</option>
+            </select>
+          </div>
+        </section>
+
+        <footer>
+          <span
+            ><strong>repo</strong>runner
+            <span class="footer-divider">/</span> Built by Astroworld</span
+          ><span
+            >Observe. Repair. Verify. Repeat.
+            <span class="footer-spark">✳</span></span
+          >
+        </footer>
+      </main>
+    </div>
+
+    <dialog id="settings-dialog">
+      <form id="settings-form">
+        <div class="dialog-heading">
+          <div class="eyebrow">BRING YOUR MODELS</div>
+          <button
+            type="button"
+            id="close-settings"
+            class="icon-button"
+            aria-label="Close model settings"
+          >
+            ×
+          </button>
+        </div>
+        <h2>One supervisor.<br />Your choice of specialists.</h2>
+        <p>
+          Use chat-completions compatible JSON endpoints. Keys stay in this
+          server's memory and clear on restart.
+        </p>
+        <fieldset>
+          <legend>01 / SUPERVISOR</legend>
+          <label
+            >Endpoint base URL<input
+              name="supervisor_url"
+              type="url"
+              placeholder="https://your-provider.example/v1"
+              required /></label
+          ><label
+            >Model ID<input
+              name="supervisor_model"
+              placeholder="Your supervisory model"
+              required /></label
+          ><label
+            >API key<input
+              name="supervisor_key"
+              type="password"
+              autocomplete="off"
+              placeholder="Optional for unauthenticated local endpoints"
+          /></label>
+        </fieldset>
+        <fieldset>
+          <legend>02 / SPECIALIST WORKERS</legend>
+          <label
+            >Endpoint base URL<input
+              name="worker_url"
+              type="url"
+              placeholder="http://127.0.0.1:8001/v1"
+              required /></label
+          ><label
+            >Model ID<input
+              name="worker_model"
+              placeholder="Your open-source model"
+              required /></label
+          ><label
+            >API key<input
+              name="worker_key"
+              type="password"
+              autocomplete="off"
+              placeholder="Optional for unauthenticated local endpoints"
+          /></label>
+        </fieldset>
+        <div class="dialog-bottom">
+          <span>Settings are not a connection test.</span
+          ><button type="submit" class="primary-button">
+            Save model settings ↗
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast hidden" role="status"></div>
+  </body>
+</html>

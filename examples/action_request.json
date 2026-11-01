@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "run_id": "mock-run",
+  "action_id": "mock-action",
+  "snapshot": "mock-initial",
+  "patches": [
+    {
+      "task_id": "dependencies",
+      "snapshot": "mock-initial",
+      "files": [
+        "requirements.txt"
+      ],
+      "unified_diff": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -1 +1,2 @@\n pytest\n+requests\n",
+      "reason": "MOCK missing dependency repair"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "-m",
+        "pytest"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 60.0
+    }
+  ],
+  "resource_refs": [],
+  "remaining_seconds": 300.0
+}

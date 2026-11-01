@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "repository_url": "https://example.invalid/mock-repo",
+  "snapshot": "mock-initial",
+  "files": {
+    "requirements.txt": "pytest\n",
+    "pyproject.toml": "requires-python = '>=3.11'"
+  },
+  "stack": "python"
+}

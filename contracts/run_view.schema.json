@@ -1,0 +1,192 @@
+{
+  "$defs": {
+    "Check": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "test",
+            "http",
+            "rebuild"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "evidence_ref": {
+          "minLength": 1,
+          "title": "Evidence Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "passed",
+        "evidence_ref"
+      ],
+      "title": "Check",
+      "type": "object"
+    },
+    "EvidenceManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "snapshot": {
+          "title": "Snapshot",
+          "type": "string"
+        },
+        "artifacts": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Artifacts",
+          "type": "object"
+        }
+      },
+      "required": [
+        "run_id",
+        "snapshot",
+        "artifacts"
+      ],
+      "title": "EvidenceManifest",
+      "type": "object"
+    },
+    "VerificationResult": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "snapshot": {
+          "title": "Snapshot",
+          "type": "string"
+        },
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/Check"
+          },
+          "title": "Checks",
+          "type": "array"
+        },
+        "evidence": {
+          "$ref": "#/$defs/EvidenceManifest"
+        },
+        "diagnostic": {
+          "default": "",
+          "maxLength": 12000,
+          "title": "Diagnostic",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "snapshot",
+        "checks",
+        "evidence"
+      ],
+      "title": "VerificationResult",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "status": {
+      "default": "running",
+      "enum": [
+        "running",
+        "awaiting_approval",
+        "completed",
+        "stopped",
+        "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "grade": {
+      "default": "RED",
+      "enum": [
+        "GREEN",
+        "AMBER",
+        "RED"
+      ],
+      "title": "Grade",
+      "type": "string"
+    },
+    "steps": {
+      "default": 0,
+      "title": "Steps",
+      "type": "integer"
+    },
+    "rounds": {
+      "default": 0,
+      "title": "Rounds",
+      "type": "integer"
+    },
+    "reason": {
+      "default": "",
+      "title": "Reason",
+      "type": "string"
+    },
+    "pending_approval": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pending Approval"
+    },
+    "approval_kind": {
+      "anyOf": [
+        {
+          "enum": [
+            "resource",
+            "final",
+            "review"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approval Kind"
+    },
+    "verification": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/VerificationResult"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "run_id"
+  ],
+  "title": "RunView",
+  "type": "object"
+}

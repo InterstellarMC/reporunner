@@ -1,0 +1,27 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "approval_id": {
+      "title": "Approval Id",
+      "type": "string"
+    },
+    "approved": {
+      "title": "Approved",
+      "type": "boolean"
+    },
+    "resource_refs": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Resource Refs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "approval_id",
+    "approved"
+  ],
+  "title": "HumanApproval",
+  "type": "object"
+}

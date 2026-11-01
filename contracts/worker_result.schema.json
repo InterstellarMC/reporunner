@@ -1,0 +1,94 @@
+{
+  "$defs": {
+    "PatchProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "snapshot": {
+          "title": "Snapshot",
+          "type": "string"
+        },
+        "files": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Files",
+          "type": "array"
+        },
+        "unified_diff": {
+          "maxLength": 50000,
+          "minLength": 1,
+          "title": "Unified Diff",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id",
+        "snapshot",
+        "files",
+        "unified_diff",
+        "reason"
+      ],
+      "title": "PatchProposal",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "task_id": {
+      "title": "Task Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "completed",
+        "blocked"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "findings": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Findings",
+      "type": "object"
+    },
+    "evidence": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "patches": {
+      "items": {
+        "$ref": "#/$defs/PatchProposal"
+      },
+      "title": "Patches",
+      "type": "array"
+    },
+    "unresolved_questions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unresolved Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "task_id",
+    "status"
+  ],
+  "title": "WorkerResult",
+  "type": "object"
+}

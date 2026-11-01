@@ -1,0 +1,100 @@
+{
+  "scope": "Small local Docker smoke cases; no model calls, code repairs, or human acceptance. Go/Rust/Java/.NET include external dependencies.",
+  "results": [
+    {
+      "runtime": "node",
+      "passed": true,
+      "checks": [
+        {
+          "name": "Sandbox HTTP 200",
+          "kind": "http",
+          "passed": true,
+          "evidence_ref": "http.log"
+        },
+        {
+          "name": "Fresh image build + independent rerun",
+          "kind": "rebuild",
+          "passed": true,
+          "evidence_ref": "rebuild.log"
+        }
+      ],
+      "diagnostic": ""
+    },
+    {
+      "runtime": "go",
+      "passed": true,
+      "checks": [
+        {
+          "name": "Original repository tests",
+          "kind": "test",
+          "passed": true,
+          "evidence_ref": "tests.log"
+        },
+        {
+          "name": "Fresh image build + independent rerun",
+          "kind": "rebuild",
+          "passed": true,
+          "evidence_ref": "rebuild.log"
+        }
+      ],
+      "diagnostic": ""
+    },
+    {
+      "runtime": "rust",
+      "passed": true,
+      "checks": [
+        {
+          "name": "Original repository tests",
+          "kind": "test",
+          "passed": true,
+          "evidence_ref": "tests.log"
+        },
+        {
+          "name": "Fresh image build + independent rerun",
+          "kind": "rebuild",
+          "passed": true,
+          "evidence_ref": "rebuild.log"
+        }
+      ],
+      "diagnostic": ""
+    },
+    {
+      "runtime": "java",
+      "passed": true,
+      "checks": [
+        {
+          "name": "Original repository tests",
+          "kind": "test",
+          "passed": true,
+          "evidence_ref": "tests.log"
+        },
+        {
+          "name": "Fresh image build + independent rerun",
+          "kind": "rebuild",
+          "passed": true,
+          "evidence_ref": "rebuild.log"
+        }
+      ],
+      "diagnostic": ""
+    },
+    {
+      "runtime": "dotnet",
+      "passed": true,
+      "checks": [
+        {
+          "name": "Original repository tests",
+          "kind": "test",
+          "passed": true,
+          "evidence_ref": "tests.log"
+        },
+        {
+          "name": "Fresh image build + independent rerun",
+          "kind": "rebuild",
+          "passed": true,
+          "evidence_ref": "rebuild.log"
+        }
+      ],
+      "diagnostic": ""
+    }
+  ]
+}

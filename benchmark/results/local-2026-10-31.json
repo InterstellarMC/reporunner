@@ -1,0 +1,120 @@
+{
+  "id": "849bba459c8b425685b7d21190f74629",
+  "source": "10 curated local repositories; not a public-repository benchmark",
+  "approval_policy": "Verified fixture results accepted automatically; resource blockers denied. This is an evaluation policy, not a senior human review.",
+  "status": "completed",
+  "started_at": "2026-10-31T16:04:57.068475+00:00",
+  "results": [
+    {
+      "fixture": "python-dependency",
+      "title": "The missing dependency",
+      "expected": "fixable",
+      "run_id": "0e572199ad0143e395d040fd38523723",
+      "status": "completed",
+      "grade": "GREEN",
+      "steps": 13,
+      "seconds": 7.67,
+      "reason": "verified, rebuilt, and approved"
+    },
+    {
+      "fixture": "python-import",
+      "title": "One letter away",
+      "expected": "fixable",
+      "run_id": "ca94697748f444ac9d73b7e1df01f966",
+      "status": "completed",
+      "grade": "GREEN",
+      "steps": 13,
+      "seconds": 6.15,
+      "reason": "verified, rebuilt, and approved"
+    },
+    {
+      "fixture": "python-config",
+      "title": "A number in disguise",
+      "expected": "fixable",
+      "run_id": "79a06c61032a4d349a5dcafc9d69a404",
+      "status": "completed",
+      "grade": "GREEN",
+      "steps": 13,
+      "seconds": 5.85,
+      "reason": "verified, rebuilt, and approved"
+    },
+    {
+      "fixture": "python-web",
+      "title": "The server that won't start",
+      "expected": "fixable",
+      "run_id": "b5db56cbd46b489484b0e7255e314318",
+      "status": "completed",
+      "grade": "GREEN",
+      "steps": 14,
+      "seconds": 58.01,
+      "reason": "verified, rebuilt, and approved"
+    },
+    {
+      "fixture": "node-config",
+      "title": "Strictly a number",
+      "expected": "fixable",
+      "run_id": "247fae4559174f1985f58424ffe27185",
+      "status": "completed",
+      "grade": "GREEN",
+      "steps": 11,
+      "seconds": 8.66,
+      "reason": "verified, rebuilt, and approved"
+    },
+    {
+      "fixture": "node-import",
+      "title": "A missing sibling",
+      "expected": "fixable",
+      "run_id": "2500ff5a50c24923820eaa6937111799",
+      "status": "completed",
+      "grade": "GREEN",
+      "steps": 11,
+      "seconds": 7.78,
+      "reason": "verified, rebuilt, and approved"
+    },
+    {
+      "fixture": "node-test-script",
+      "title": "Yesterday's test command",
+      "expected": "fixable",
+      "run_id": "f8b161e7df4241f7a2b131f2bb0eae51",
+      "status": "completed",
+      "grade": "GREEN",
+      "steps": 11,
+      "seconds": 3.36,
+      "reason": "verified, rebuilt, and approved"
+    },
+    {
+      "fixture": "python-secret",
+      "title": "Ask, don't invent",
+      "expected": "blocked",
+      "run_id": "c871a23aa9d34208941a6682a923a34f",
+      "status": "stopped",
+      "grade": "RED",
+      "steps": 6,
+      "seconds": 2.38,
+      "reason": "human declined approval"
+    },
+    {
+      "fixture": "python-gpu",
+      "title": "Hardware is a real boundary",
+      "expected": "blocked",
+      "run_id": "3a68ae753d18467ea9e7d0f0a9cafe34",
+      "status": "stopped",
+      "grade": "RED",
+      "steps": 6,
+      "seconds": 2.39,
+      "reason": "human declined approval"
+    },
+    {
+      "fixture": "python-private",
+      "title": "A private dependency",
+      "expected": "blocked",
+      "run_id": "2c079c1a4d384822877deed174efbe4d",
+      "status": "stopped",
+      "grade": "RED",
+      "steps": 6,
+      "seconds": 2.32,
+      "reason": "human declined approval"
+    }
+  ],
+  "finished_at": "2026-10-31T16:06:41.702654+00:00"
+}

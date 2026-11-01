@@ -1,0 +1,136 @@
+{
+  "$defs": {
+    "Command": {
+      "additionalProperties": false,
+      "properties": {
+        "argv": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 50,
+          "minItems": 1,
+          "title": "Argv",
+          "type": "array"
+        },
+        "cwd": {
+          "default": ".",
+          "title": "Cwd",
+          "type": "string"
+        },
+        "timeout_seconds": {
+          "default": 60,
+          "exclusiveMinimum": 0,
+          "maximum": 600,
+          "title": "Timeout Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "argv"
+      ],
+      "title": "Command",
+      "type": "object"
+    },
+    "PatchProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "snapshot": {
+          "title": "Snapshot",
+          "type": "string"
+        },
+        "files": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Files",
+          "type": "array"
+        },
+        "unified_diff": {
+          "maxLength": 50000,
+          "minLength": 1,
+          "title": "Unified Diff",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id",
+        "snapshot",
+        "files",
+        "unified_diff",
+        "reason"
+      ],
+      "title": "PatchProposal",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "action_id": {
+      "title": "Action Id",
+      "type": "string"
+    },
+    "snapshot": {
+      "title": "Snapshot",
+      "type": "string"
+    },
+    "patches": {
+      "items": {
+        "$ref": "#/$defs/PatchProposal"
+      },
+      "title": "Patches",
+      "type": "array"
+    },
+    "commands": {
+      "items": {
+        "$ref": "#/$defs/Command"
+      },
+      "maxItems": 1,
+      "minItems": 1,
+      "title": "Commands",
+      "type": "array"
+    },
+    "resource_refs": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Resource Refs",
+      "type": "array"
+    },
+    "remaining_seconds": {
+      "exclusiveMinimum": 0,
+      "maximum": 600,
+      "title": "Remaining Seconds",
+      "type": "number"
+    }
+  },
+  "required": [
+    "run_id",
+    "action_id",
+    "snapshot",
+    "patches",
+    "commands",
+    "remaining_seconds"
+  ],
+  "title": "ActionRequest",
+  "type": "object"
+}

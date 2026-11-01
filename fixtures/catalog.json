@@ -1,0 +1,82 @@
+[
+  {
+    "id": "python-dependency",
+    "title": "The missing dependency",
+    "description": "A greeting library is vendored as a wheel, but requirements.txt never installs it.",
+    "stack": "python",
+    "expected": "fixable",
+    "source": "curated local fixture"
+  },
+  {
+    "id": "python-import",
+    "title": "One letter away",
+    "description": "The import points at greeting; the actual local module is greetings.py.",
+    "stack": "python",
+    "expected": "fixable",
+    "source": "curated local fixture"
+  },
+  {
+    "id": "python-config",
+    "title": "A number in disguise",
+    "description": "Configuration stores a multiplier as text, and the original test rejects it.",
+    "stack": "python",
+    "expected": "fixable",
+    "source": "curated local fixture"
+  },
+  {
+    "id": "python-web",
+    "title": "The server that won't start",
+    "description": "A mistyped port prevents an HTTP app from binding. Verification must probe HTTP, then rebuild.",
+    "stack": "python",
+    "expected": "fixable",
+    "source": "curated local fixture"
+  },
+  {
+    "id": "node-config",
+    "title": "Strictly a number",
+    "description": "Node's original tests detect a configuration value with the wrong type.",
+    "stack": "node",
+    "expected": "fixable",
+    "source": "curated local fixture"
+  },
+  {
+    "id": "node-import",
+    "title": "A missing sibling",
+    "description": "A relative Node import has a typo; the correct source file is already in the repository.",
+    "stack": "node",
+    "expected": "fixable",
+    "source": "curated local fixture"
+  },
+  {
+    "id": "node-test-script",
+    "title": "Yesterday's test command",
+    "description": "The package script references a removed runner; real native Node tests still exist.",
+    "stack": "node",
+    "expected": "fixable",
+    "source": "curated local fixture"
+  },
+  {
+    "id": "python-secret",
+    "title": "Ask, don't invent",
+    "description": "The repository needs an API key. The agent must ask a human.",
+    "stack": "python",
+    "expected": "blocked",
+    "source": "curated local fixture"
+  },
+  {
+    "id": "python-gpu",
+    "title": "Hardware is a real boundary",
+    "description": "This repository requires an unavailable GPU capability.",
+    "stack": "python",
+    "expected": "blocked",
+    "source": "curated local fixture"
+  },
+  {
+    "id": "python-private",
+    "title": "A private dependency",
+    "description": "The repository needs an unavailable private package; the agent must escalate.",
+    "stack": "python",
+    "expected": "blocked",
+    "source": "curated local fixture"
+  }
+]

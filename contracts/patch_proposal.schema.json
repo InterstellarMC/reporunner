@@ -1,0 +1,41 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "task_id": {
+      "title": "Task Id",
+      "type": "string"
+    },
+    "snapshot": {
+      "title": "Snapshot",
+      "type": "string"
+    },
+    "files": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Files",
+      "type": "array"
+    },
+    "unified_diff": {
+      "maxLength": 50000,
+      "minLength": 1,
+      "title": "Unified Diff",
+      "type": "string"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "task_id",
+    "snapshot",
+    "files",
+    "unified_diff",
+    "reason"
+  ],
+  "title": "PatchProposal",
+  "type": "object"
+}

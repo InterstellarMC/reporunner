@@ -1,22 +1,32 @@
 [build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "reporunner"
-version = "0.1.0"
-description = "RepoRunner — team Astroworld, Agentathon 2026"
-readme = "README.md"
+version = "1.0.0"
+description = "RepoRunner: bounded repository repair with real sandbox execution and auditable evidence"
 requires-python = ">=3.11"
-dependencies = [
-    "litellm",
-    "docker",
-    "streamlit",
-    "playwright",
-]
+dependencies = ["fastapi>=0.115,<1", "httpx>=0.27,<1", "pydantic>=2.9,<3", "uvicorn>=0.30,<1"]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+test = ["pytest>=8,<10", "pytest-asyncio>=0.24,<2", "jsonschema>=4.23,<5"]
+screenshots = ["playwright>=1.48,<2"]
 
-[tool.setuptools.packages.find]
-include = ["reporunner"]
+[project.scripts]
+reporunner-demo = "backend.orchestrator.demo:main"
+reporunner-contracts = "backend.orchestrator.contracts:main"
+reporunner = "backend.app.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"frontend" = "backend/app/assets/frontend"
+"fixtures" = "backend/app/assets/fixtures"
+"benchmark/public_repositories.json" = "backend/app/assets/benchmark/public_repositories.json"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]

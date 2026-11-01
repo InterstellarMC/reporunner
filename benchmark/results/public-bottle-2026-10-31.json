@@ -1,0 +1,111 @@
+{
+  "run": {
+    "run_id": "78f7612e5eeb4ec1bdbe8de8fad2446a",
+    "status": "completed",
+    "grade": "GREEN",
+    "steps": 6,
+    "rounds": 1,
+    "reason": "verified, rebuilt, and approved",
+    "pending_approval": null,
+    "approval_kind": null,
+    "verification": {
+      "run_id": "78f7612e5eeb4ec1bdbe8de8fad2446a",
+      "snapshot": "ba77b9165b3b6b9b74807ba62e0561b00f7144ccc85996cdd4c4baf14f659ca6",
+      "checks": [
+        {
+          "name": "Original repository tests",
+          "kind": "test",
+          "passed": true,
+          "evidence_ref": "tests.log"
+        },
+        {
+          "name": "Fresh image build + independent rerun",
+          "kind": "rebuild",
+          "passed": true,
+          "evidence_ref": "rebuild.log"
+        }
+      ],
+      "evidence": {
+        "run_id": "78f7612e5eeb4ec1bdbe8de8fad2446a",
+        "snapshot": "ba77b9165b3b6b9b74807ba62e0561b00f7144ccc85996cdd4c4baf14f659ca6",
+        "artifacts": {
+          "Dockerfile": "Dockerfile",
+          "rebuild.log": "rebuild.log",
+          "execution.log": "execution.log",
+          "RUN.md": "RUN.md",
+          "tests.log": "tests.log"
+        }
+      },
+      "diagnostic": ""
+    }
+  },
+  "metadata": {
+    "repository_url": "https://github.com/bottlepy/bottle",
+    "fixture": null,
+    "mode": "local",
+    "network": false,
+    "started_at": "2026-10-31T16:13:47.262058+00:00",
+    "finished_at": "2026-10-31T16:14:41.777947+00:00",
+    "elapsed_seconds": 54.52,
+    "source": "public GitHub repository",
+    "approval_policy": "human review"
+  },
+  "artifacts": [
+    {
+      "name": "Dockerfile",
+      "bytes": 307,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/Dockerfile"
+    },
+    {
+      "name": "RUN.md",
+      "bytes": 674,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/RUN.md"
+    },
+    {
+      "name": "checksums.json",
+      "bytes": 764,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/checksums.json"
+    },
+    {
+      "name": "evidence.json",
+      "bytes": 803,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/evidence.json"
+    },
+    {
+      "name": "evidence.zip",
+      "bytes": 1019389,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/evidence.zip"
+    },
+    {
+      "name": "execution.log",
+      "bytes": 119829,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/execution.log"
+    },
+    {
+      "name": "rebuild.log",
+      "bytes": 40853,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/rebuild.log"
+    },
+    {
+      "name": "result.json",
+      "bytes": 1105,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/result.json"
+    },
+    {
+      "name": "run.json",
+      "bytes": 329,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/run.json"
+    },
+    {
+      "name": "tests.log",
+      "bytes": 39372,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/tests.log"
+    },
+    {
+      "name": "timeline.jsonl",
+      "bytes": 28621,
+      "url": "/api/runs/78f7612e5eeb4ec1bdbe8de8fad2446a/artifacts/timeline.jsonl"
+    }
+  ],
+  "review_note": "Accepted by the development assistant during browser QA, not claimed as a senior human review. No source patch was needed."
+}

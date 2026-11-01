@@ -1,0 +1,26 @@
+{
+  "run_id": "mock-run",
+  "snapshot": "mock-repaired",
+  "checks": [
+    {
+      "name": "MOCK tests",
+      "kind": "test",
+      "passed": true,
+      "evidence_ref": "mock://tests"
+    },
+    {
+      "name": "MOCK fresh rebuild",
+      "kind": "rebuild",
+      "passed": true,
+      "evidence_ref": "mock://rebuild"
+    }
+  ],
+  "evidence": {
+    "run_id": "mock-run",
+    "snapshot": "mock-repaired",
+    "artifacts": {
+      "Dockerfile": "mock://Dockerfile",
+      "RUN.md": "mock://RUN.md"
+    }
+  }
+}

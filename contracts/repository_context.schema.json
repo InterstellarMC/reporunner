@@ -1,0 +1,49 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "repository_url": {
+      "title": "Repository Url",
+      "type": "string"
+    },
+    "snapshot": {
+      "minLength": 1,
+      "title": "Snapshot",
+      "type": "string"
+    },
+    "files": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "maxProperties": 100,
+      "title": "Files",
+      "type": "object"
+    },
+    "stack": {
+      "default": "unknown",
+      "enum": [
+        "python",
+        "node",
+        "go",
+        "rust",
+        "java",
+        "dotnet",
+        "unknown"
+      ],
+      "title": "Stack",
+      "type": "string"
+    }
+  },
+  "required": [
+    "repository_url",
+    "snapshot",
+    "files"
+  ],
+  "title": "RepositoryContext",
+  "type": "object"
+}

@@ -1,0 +1,13 @@
+name: Supervisor contracts and tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --extra test
+      - run: uv run pytest -q
+      - run: node --check frontend/app.js
+      - run: uv run reporunner-contracts
+      - run: git diff --exit-code -- contracts

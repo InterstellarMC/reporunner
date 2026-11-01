@@ -1,0 +1,86 @@
+{
+  "$defs": {
+    "Specialist": {
+      "enum": [
+        "repository",
+        "environment",
+        "dependency",
+        "configuration",
+        "build",
+        "test"
+      ],
+      "title": "Specialist",
+      "type": "string"
+    },
+    "WorkerTask": {
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "specialist": {
+          "$ref": "#/$defs/Specialist"
+        },
+        "objective": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "title": "Objective",
+          "type": "string"
+        },
+        "scope": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Scope",
+          "type": "array"
+        },
+        "acceptance_criteria": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "title": "Acceptance Criteria",
+          "type": "array"
+        }
+      },
+      "required": [
+        "task_id",
+        "specialist",
+        "objective",
+        "scope",
+        "acceptance_criteria"
+      ],
+      "title": "WorkerTask",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "tasks": {
+      "items": {
+        "$ref": "#/$defs/WorkerTask"
+      },
+      "maxItems": 8,
+      "title": "Tasks",
+      "type": "array"
+    },
+    "human_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Human Reason"
+    }
+  },
+  "title": "Decomposition",
+  "type": "object"
+}

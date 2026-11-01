@@ -1,0 +1,45 @@
+{
+  "review_note": "Development QA on a separate real local HTTP fixture; not part of the 10-repository suite.",
+  "run": {
+    "run_id": "node-http-qa",
+    "status": "completed",
+    "grade": "GREEN",
+    "steps": 6,
+    "rounds": 1,
+    "reason": "verified, rebuilt, and approved",
+    "pending_approval": null,
+    "approval_kind": null,
+    "verification": {
+      "run_id": "node-http-qa",
+      "snapshot": "eb73afc2b833471a6f948f74bd3a264c86f66b58a940a122f31f5e29d95e86d0",
+      "checks": [
+        {
+          "name": "Sandbox HTTP 200",
+          "kind": "http",
+          "passed": true,
+          "evidence_ref": "http.log"
+        },
+        {
+          "name": "Fresh image build + independent rerun",
+          "kind": "rebuild",
+          "passed": true,
+          "evidence_ref": "rebuild.log"
+        }
+      ],
+      "evidence": {
+        "run_id": "node-http-qa",
+        "snapshot": "eb73afc2b833471a6f948f74bd3a264c86f66b58a940a122f31f5e29d95e86d0",
+        "artifacts": {
+          "screenshot.png": "screenshot.png",
+          "Dockerfile": "Dockerfile",
+          "rebuild.log": "rebuild.log",
+          "execution.log": "execution.log",
+          "http-response.html": "http-response.html",
+          "http.log": "http.log",
+          "RUN.md": "RUN.md"
+        }
+      },
+      "diagnostic": ""
+    }
+  }
+}

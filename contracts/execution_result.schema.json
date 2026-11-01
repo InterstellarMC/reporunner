@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "RepositoryContext": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "repository_url": {
+          "title": "Repository Url",
+          "type": "string"
+        },
+        "snapshot": {
+          "minLength": 1,
+          "title": "Snapshot",
+          "type": "string"
+        },
+        "files": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "maxProperties": 100,
+          "title": "Files",
+          "type": "object"
+        },
+        "stack": {
+          "default": "unknown",
+          "enum": [
+            "python",
+            "node",
+            "go",
+            "rust",
+            "java",
+            "dotnet",
+            "unknown"
+          ],
+          "title": "Stack",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository_url",
+        "snapshot",
+        "files"
+      ],
+      "title": "RepositoryContext",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "action_id": {
+      "title": "Action Id",
+      "type": "string"
+    },
+    "exit_code": {
+      "title": "Exit Code",
+      "type": "integer"
+    },
+    "stdout": {
+      "maxLength": 50000,
+      "title": "Stdout",
+      "type": "string"
+    },
+    "stderr": {
+      "maxLength": 50000,
+      "title": "Stderr",
+      "type": "string"
+    },
+    "timed_out": {
+      "default": false,
+      "title": "Timed Out",
+      "type": "boolean"
+    },
+    "context": {
+      "$ref": "#/$defs/RepositoryContext"
+    },
+    "blocker": {
+      "anyOf": [
+        {
+          "enum": [
+            "secret",
+            "gpu",
+            "private_package"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Blocker"
+    }
+  },
+  "required": [
+    "run_id",
+    "action_id",
+    "exit_code",
+    "stdout",
+    "stderr",
+    "context"
+  ],
+  "title": "ExecutionResult",
+  "type": "object"
+}

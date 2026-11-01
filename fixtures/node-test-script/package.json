@@ -1,0 +1,8 @@
+{
+  "name": "reporunner-node-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node tests/old-runner.js"
+  }
+}

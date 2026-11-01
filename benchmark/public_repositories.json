@@ -1,0 +1,15 @@
+{
+  "status": "proposed; not evaluated as a suite",
+  "repositories": [
+    "https://github.com/bottlepy/bottle",
+    "https://github.com/psf/requests",
+    "https://github.com/pallets/flask",
+    "https://github.com/pallets/click",
+    "https://github.com/dateutil/dateutil",
+    "https://github.com/Textualize/rich",
+    "https://github.com/lodash/lodash",
+    "https://github.com/expressjs/express",
+    "https://github.com/koajs/koa",
+    "https://github.com/sindresorhus/is"
+  ]
+}

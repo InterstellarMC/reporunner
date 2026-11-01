@@ -1,0 +1,19 @@
+{
+  "run_id": "mock-run",
+  "action_id": "mock-action",
+  "exit_code": 0,
+  "stdout": "MOCK test passed",
+  "stderr": "",
+  "timed_out": false,
+  "context": {
+    "schema_version": "1.0",
+    "repository_url": "https://example.invalid/mock-repo",
+    "snapshot": "mock-repaired",
+    "files": {
+      "requirements.txt": "pytest\nrequests\n",
+      "pyproject.toml": "requires-python = '>=3.11'"
+    },
+    "stack": "python"
+  },
+  "blocker": null
+}
